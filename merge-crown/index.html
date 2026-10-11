@@ -18,6 +18,10 @@
   --glow: rgba(230,160,27,.45);
   --hl: rgba(230,160,27,.16);         /* active legend row */
   --scrim: rgba(13,19,40,.88);        /* behind an enlarged screen */
+  --veil: rgba(255,253,247,.88);      /* behind the banner title */
+  --title-fill: #ffd23f;              /* the logo's yellow */
+  --title-stroke: #1b2a5c;            /* the logo's navy outline */
+  --veil-soft: rgba(255,253,247,.55);
   --on-scrim: #ffffff;
   --shadow: 0 10px 30px rgba(29,39,71,.10);
   --font-display: "Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
@@ -27,13 +31,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0e1630; --sky-2: #1a2347; --card: #172042; --ink: #f4f1e6; --muted: #aab4d2;
-    --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff;
+    --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff; --veil: rgba(23,32,66,.86); --veil-soft: rgba(23,32,66,.5);
     --shadow: 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0e1630; --sky-2: #1a2347; --card: #172042; --ink: #f4f1e6; --muted: #aab4d2;
-  --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff;
+  --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff; --veil: rgba(23,32,66,.86); --veil-soft: rgba(23,32,66,.5);
   --shadow: 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
 }
 
@@ -55,48 +59,52 @@ body {
   gap: 28px;
 }
 
-/* ---------- header ---------- */
-.head {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 24px;
-  background: var(--card);
-  border-radius: 28px;
-  box-shadow: var(--shadow);
-  padding: 28px 28px 28px 36px;
-  overflow: hidden;
+/* ---------- header: a store-page banner ---------- */
+.hero { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); position: relative; }
+.banner { position: relative; aspect-ratio: 1794 / 876; border-radius: 28px 28px 0 0; overflow: hidden; background: var(--bg); }
+.banner-img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%;
+  animation: bannerzoom calc(var(--step) * 2) ease-in-out infinite alternate;
 }
+@keyframes bannerzoom { from { transform: scale(1); } to { transform: scale(1.05); } }
+.banner::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, var(--veil) 0%, var(--veil-soft) 30%, transparent 52%);
+}
+.banner-text { position: absolute; left: 0; top: 0; bottom: 0; z-index: 1; width: 47%; padding: 40px 0 40px 40px; display: grid; align-content: center; }
 .eyebrow {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin: 0 0 4px;
+  font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold); margin: 0 0 4px;
 }
 h1 {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(30px, 5vw, 48px);
-  line-height: 1.05;
-  margin: 0 0 10px;
-  color: var(--royal);
-  text-wrap: balance;
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.12;
+  margin: 0 0 14px; color: var(--title-fill); text-wrap: balance; letter-spacing: .01em;
+  text-shadow:
+    3px 0 0 var(--title-stroke), -3px 0 0 var(--title-stroke), 0 3px 0 var(--title-stroke), 0 -3px 0 var(--title-stroke),
+    2px 2px 0 var(--title-stroke), -2px 2px 0 var(--title-stroke), 2px -2px 0 var(--title-stroke), -2px -2px 0 var(--title-stroke),
+    0 6px 0 var(--title-stroke), 2px 5px 0 var(--title-stroke), -2px 5px 0 var(--title-stroke),
+    0 10px 16px rgba(0, 0, 0, .28);
 }
-.lede { margin: 0; color: var(--muted); font-size: 18px; max-width: 34ch; }
-.splash {
-  width: 190px;
-  aspect-ratio: 3 / 4;
-  border-radius: 22px;
-  object-fit: cover;
-  border: 4px solid var(--gold);
-  box-shadow: var(--shadow);
-  max-width: 100%;
-  animation: bob 6s ease-in-out infinite;
+.lede { margin: 0; color: var(--ink); font-size: 18px; max-width: 30ch; }
+.nw { display: inline-block; white-space: nowrap; }
+.store-bar {
+  display: grid; grid-template-columns: 88px minmax(0, 1fr) auto; gap: 18px; align-items: start;
+  padding: 18px 28px 22px;
 }
-@keyframes bob { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-6px) rotate(1deg); } }
+.app-icon { width: 88px; height: 88px; border-radius: 22px; box-shadow: var(--shadow); border: 3px solid var(--card); margin-top: -46px; position: relative; z-index: 2; }
+.app-meta { display: grid; gap: 2px; padding-top: 2px; }
+.app-meta strong { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1.1; color: var(--ink); }
+.app-meta span { color: var(--muted); font-size: 15px; }
+.store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 10px; }
+.badge-slot { display: block; line-height: 0; }
+.badge-slot img { display: block; height: 44px; width: auto; }
+.soon { font-family: var(--font-display); font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+.splash-wrap { width: 190px; max-width: 100%; margin-top: -150px; position: relative; z-index: 2; }
+.splash, .splash-print {
+  display: block; width: 100%; aspect-ratio: 9 / 16; border-radius: 22px; object-fit: cover;
+  border: 4px solid var(--gold); box-shadow: 0 14px 34px rgba(29,39,71,.28); background: var(--bg);
+}
+.splash-print { display: none; }
 
 /* ---------- the loop ---------- */
 .loop {
@@ -332,6 +340,33 @@ html.export .node.is-selected .art { border-color: var(--ring); }
 .detail.swap { animation: swapin .35s ease-out; }
 @keyframes swapin { from { opacity: .2; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+/* ---------- your kingdom ---------- */
+.kingdom { padding: 24px 28px 28px; display: grid; gap: 18px; }
+.kingdom-body { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+.tank { margin: 0; display: grid; gap: 10px; }
+.tank-view {
+  position: relative; overflow: hidden; border-radius: 22px; aspect-ratio: 16 / 10;
+  border: 4px solid var(--gold); background: var(--bg); box-shadow: var(--shadow);
+}
+.tank-img, .tank-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tank-img { transform-origin: 40% 60%; animation: drift calc(var(--step) * 2) ease-in-out infinite alternate; }
+@keyframes drift { from { transform: scale(1.18) translate(3%, 2%); } to { transform: scale(1.04) translate(-2%, -1%); } }
+.tank figcaption { font-size: 15px; color: var(--muted); }
+.tank figcaption b { color: var(--ink); }
+.verbs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.verbs li {
+  display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center;
+  background: var(--bg); border-radius: 18px; padding: 10px 14px;
+  animation: row calc(var(--step) * 5) infinite;
+}
+.verbs li:nth-child(1) { animation-delay: -.25s; }
+.verbs li:nth-child(2) { animation-delay: calc(var(--step) * 5 / 4 - .25s); }
+.verbs li:nth-child(3) { animation-delay: calc(var(--step) * 5 / 2 - .25s); }
+.verbs li:nth-child(4) { animation-delay: calc(var(--step) * 15 / 4 - .25s); }
+.verbs img { width: 64px; height: 64px; object-fit: contain; }
+.verbs h3 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.1; color: var(--ink); }
+.verbs p { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+
 /* ---------- islands and creatures ---------- */
 .card { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); }
 .adv { padding: 24px 28px 28px; display: grid; gap: 18px; }
@@ -421,14 +456,6 @@ html.export .node.is-selected .art { border-color: var(--ring); }
 .lightbox.is-open .lb-fig { animation: lbin .25s ease-out; }
 @keyframes lbin { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
 
-/* ---------- website footer (downloads) ---------- */
-.site-foot { display: flex; flex-wrap: wrap; gap: 10px 14px; justify-content: center; align-items: center; color: var(--muted); font-size: 14px; padding-block: 4px 8px; }
-.site-foot a { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 999px; background: var(--card); color: var(--royal); font-family: var(--font-display); font-weight: 800; font-size: 15px; text-decoration: none; box-shadow: var(--shadow); }
-.site-foot a:hover { background: var(--hl); }
-.site-foot a:focus-visible { outline: 3px solid var(--royal); outline-offset: 3px; }
-.site-foot .by { flex-basis: 100%; text-align: center; margin-top: 4px; }
-@media print { .site-foot { display: none; } }
-
 /* ---------- come-back tiles ---------- */
 .hooks {
   display: grid;
@@ -459,20 +486,32 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   .adv-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 18px; }
   .adv-steps li:nth-child(3)::before { display: none; }
   .bet-body { grid-template-columns: minmax(0, 1fr); }
+  .kingdom-body { grid-template-columns: minmax(0, 1fr); }
   .peers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .peers li.us { grid-column: 1 / -1; }
 }
 @media screen and (max-width: 640px) {
-  .head { grid-template-columns: 1fr; padding: 24px; text-align: center; justify-items: center; }
-  .lede { margin-inline: auto; }
-  .splash { width: 150px; }
+  .banner { aspect-ratio: auto; overflow: visible; background: none; }
+  .banner-img { position: static; display: block; aspect-ratio: 4 / 3; height: auto; object-position: 62% 50%; border-radius: 28px 28px 0 0; animation: none; }
+  .banner::after { display: none; }
+  .banner-text { position: static; width: auto; padding: 18px 18px 0; text-align: center; justify-items: center; }
+  .hero h1 { font-size: 32px; }
+  .lede { margin-inline: auto; font-size: 16px; }
+  .store-bar { grid-template-columns: 64px minmax(0, 1fr); padding: 16px 16px 20px; gap: 12px; }
+  .app-icon { width: 64px; height: 64px; border-radius: 16px; margin-top: 0; }
+  .app-meta strong { font-size: 20px; }
+  .badge-slot img { height: 38px; }
+  .store-badges { gap: 8px; }
+  .splash-wrap { grid-column: 1 / -1; justify-self: center; width: 200px; margin-top: 6px; }
   .loop { padding: 20px 14px 24px; }
   .legend li { padding: 8px 10px; column-gap: 12px; grid-template-columns: 34px 1fr; }
   .legend .badge { width: 34px; height: 34px; font-size: 17px; }
   .legend h3 { font-size: 20px; }
   .legend p { font-size: 15px; }
   .hooks { grid-template-columns: 1fr; }
-  .adv, .shots, .bet { padding: 20px 14px 24px; }
+  .adv, .shots, .bet, .kingdom { padding: 20px 14px 24px; }
+  .verbs img { width: 52px; height: 52px; }
+  .verbs li { grid-template-columns: 52px 1fr; }
   .adv-steps li + li::before { display: none; }
   .adv-art { width: 92px; height: 92px; }
   .detail { grid-template-columns: 92px minmax(0, 1fr); gap: 14px; padding: 12px; }
@@ -515,10 +554,9 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .poster { gap: 14px; max-width: none; }
-  .head, .card, .loop, .hook { box-shadow: none !important; border: 1px solid #dfe5f1; }
-  .head, .bet, .loop, .adv, .shots, .hook, .peers li, .print-details .pd, figure { break-inside: avoid; page-break-inside: avoid; }
+  .hero, .card, .loop, .hook { box-shadow: none !important; border: 1px solid #dfe5f1; }
+  .hero, .bet, .loop, .adv, .shots, .hook, .peers li, .print-details .pd, figure { break-inside: avoid; page-break-inside: avoid; }
   .loop, .adv, .shots { break-before: auto; }
-  .splash { animation: none; }
   .hint, .detail, .ring .token, .reward, .merge .a, .merge .b, .map .pulse { display: none !important; }
   .merge .out { opacity: 1 !important; transform: none !important; }
   .hatch .baby { opacity: 0 !important; }
@@ -534,8 +572,11 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   /* a compact desktop layout sized for A4 portrait: page 1 the bet, page 2 the loop, page 3 islands, screens, hooks */
   h1 { font-size: 34px; }
   .lede { font-size: 15px; }
-  .head { padding: 18px 22px; }
-  .splash { width: 130px; }
+  .banner-img { animation: none; }
+  .splash-wrap { width: 120px; margin-top: -90px; }
+  .store-bar { padding: 12px 18px 14px; }
+  .splash { display: none !important; }
+  .splash-print { display: block; }
   .bet, .loop, .adv, .shots { padding: 16px 18px 18px; gap: 12px; }
   .sec-head h2, .loop-title { font-size: 21px; }
   .bet-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
@@ -558,7 +599,13 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   .print-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .print-details h3 { grid-column: 1 / -1; font-size: 16px; }
   .print-details .pd p, .print-details .pd li { font-size: 12px; }
-  .adv { break-before: page; }
+  .kingdom { break-before: page; padding: 16px 18px 18px; gap: 12px; }
+  .kingdom-body { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; }
+  .tank-img { transform: none; }
+  .verbs li { padding: 6px 10px; grid-template-columns: 44px 1fr; }
+  .verbs img { width: 44px; height: 44px; }
+  .verbs h3 { font-size: 15px; }
+  .verbs p, .tank figcaption { font-size: 12px; }
   .adv-steps { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
   .adv-steps li { padding: 8px 6px 10px; }
   .adv-steps li + li::before { top: 46px; }
@@ -579,13 +626,33 @@ html.export .node.is-selected .art { border-color: var(--ring); }
 </style>
 
 <main class="poster">
-  <header class="head">
-    <div>
-      <p class="eyebrow">Merge Crown</p>
-      <h1>Merge. Deliver. Build a kingdom.</h1>
-      <p class="lede">A relaxing merge puzzle where every match helps the Queen grow her town.</p>
+  <header class="hero">
+    <div class="banner">
+      <img class="banner-img" src="img/keyart.jpg" alt="The Queen and her dragon in front of the kingdom">
+      <div class="banner-text">
+        <p class="eyebrow">Merge Crown</p>
+        <h1><span class="nw">Merge. Deliver.</span> <span class="nw">Build a kingdom.</span></h1>
+        <p class="lede">A relaxing merge puzzle where every match helps the Queen grow her town.</p>
+      </div>
     </div>
-    <img class="splash" src="img/splash.jpg" alt="The Queen riding her dragon over the kingdom">
+    <div class="store-bar">
+      <img class="app-icon" src="img/appicon.png" alt="Merge Crown app icon">
+      <div class="app-meta">
+        <strong>Merge Crown</strong>
+        <span>Merge puzzle &middot; Kingdom builder</span>
+        <div class="store-badges" aria-label="Store links coming soon">
+          <span class="badge-slot" title="Google Play link coming soon"><img src="img/google-play.svg" alt="Get it on Google Play (coming soon)"></span>
+          <span class="badge-slot" title="App Store link coming soon"><img src="img/app-store.svg" alt="Download on the App Store (coming soon)"></span>
+          <span class="soon">Coming soon</span>
+        </div>
+      </div>
+      <div class="splash-wrap">
+        <video class="splash" autoplay muted loop playsinline preload="auto" poster="img/header-poster.jpg" aria-label="The Queen flies her dragon over the kingdom">
+          <source src="header.mp4" type="video/mp4">
+        </video>
+        <img class="splash-print" src="img/header-poster.jpg" alt="">
+      </div>
+    </div>
   </header>
 
   <section class="bet card" aria-labelledby="bet-title">
@@ -600,7 +667,7 @@ html.export .node.is-selected .art { border-color: var(--ring); }
         <ul class="how">
           <li><span class="tick">1</span><span><b>Keep merge easy.</b> One board on one screen, with no big map to pan around.</span></li>
           <li><span class="tick">2</span><span><b>What you build stays.</b> Orders pay for a town that keeps growing.</span></li>
-          <li><span class="tick">3</span><span><b>Collect what you hatch.</b> Creatures move into your town and fill the Breed Book.</span></li>
+          <li><span class="tick">3</span><span><b>Own magical creatures.</b> The creatures you find on your adventures live in your kingdom.</span></li>
         </ul>
         <p class="pass"><b>It works if</b> players keep coming back for longer than in today's one-screen merge games.</p>
       </div>
@@ -722,11 +789,33 @@ html.export .node.is-selected .art { border-color: var(--ring); }
     </div>
   </section>
 
+  <section class="kingdom card" aria-labelledby="kingdom-title">
+    <div class="sec-head">
+      <p class="kicker">Your kingdom</p>
+      <h2 id="kingdom-title">Expand it. Build it. Make it yours.</h2>
+      <p>A town you shape with your own hands, and love to look at.</p>
+    </div>
+    <div class="kingdom-body">
+      <figure class="tank">
+        <div class="tank-view" id="tank-view">
+          <img class="tank-img" src="img/town_wide.jpg" alt="A grown town by the sea, with wild land to clear behind it">
+        </div>
+        <figcaption><b>The aquarium feeling.</b> Townsfolk stroll the streets, your creatures roam, and the town keeps living while you watch.</figcaption>
+      </figure>
+      <ul class="verbs">
+        <li><img src="img/castle.png" alt=""><div><h3>Expand</h3><p>Clear wild land and push your borders outward.</p></div></li>
+        <li><img src="img/hammer.png" alt=""><div><h3>Build</h3><p>Homes, workshops and landmarks, each with a job.</p></div></li>
+        <li><img src="img/fountain.png" alt=""><div><h3>Decorate</h3><p>Gardens, fountains and statues make it yours.</p></div></li>
+        <li><img src="img/rotate.png" alt=""><div><h3>Arrange</h3><p>Move and turn anything to lay out the town your way.</p></div></li>
+      </ul>
+    </div>
+  </section>
+
   <section class="adv card" aria-labelledby="adv-title">
     <div class="sec-head">
-      <p class="kicker">Opens as the town grows</p>
-      <h2 id="adv-title">Islands and creatures</h2>
-      <p>Each new island is its own little adventure.</p>
+      <p class="kicker">The adventure layer</p>
+      <h2 id="adv-title">Islands and magical creatures</h2>
+      <p>Every island is an adventure, and every creature you find comes home with you.</p>
     </div>
     <ol class="adv-steps">
       <li style="--j:0">
@@ -743,7 +832,7 @@ html.export .node.is-selected .art { border-color: var(--ring); }
       </li>
       <li style="--j:3">
         <div class="adv-art home"><img class="book" src="img/book.png" alt="The Breed Book"><img class="uni" src="img/unicorn.png" alt=""></div>
-        <h3>Bring them home</h3><p>Creatures move into your town and fill the Breed Book.</p>
+        <h3>See them at home</h3><p>Your creatures live in your kingdom, and fill the Breed Book.</p>
       </li>
     </ol>
   </section>
@@ -777,12 +866,6 @@ html.export .node.is-selected .art { border-color: var(--ring); }
       <div><h4>Always something cooking</h4><p>Buildings and workshops keep working while players are away.</p></div>
     </article>
   </section>
-  <footer class="site-foot">
-    <a href="merge-crown.pdf" download>Download the PDF (3 pages)</a>
-    <a href="merge-crown-loop.mp4" download>Core loop video (MP4)</a>
-    <a href="merge-crown-loop.gif" download>Core loop GIF</a>
-    <p class="by">Nimble Games &middot; <a href="https://nimble.gs/" style="all:unset;cursor:pointer;color:inherit;text-decoration:underline">nimble.gs</a></p>
-  </footer>
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Screen from the game" hidden>
     <button class="lb-btn lb-close" type="button" aria-label="Close">&times;</button>
     <button class="lb-btn lb-prev" type="button" aria-label="Previous screen">&lsaquo;</button>
