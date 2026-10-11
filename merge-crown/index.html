@@ -18,10 +18,11 @@
   --glow: rgba(230,160,27,.45);
   --hl: rgba(230,160,27,.16);         /* active legend row */
   --scrim: rgba(13,19,40,.88);        /* behind an enlarged screen */
-  --veil: rgba(255,253,247,.88);      /* behind the banner title */
+  --glass: rgba(255, 255, 255, .55);   /* the site's liquid glass */
+  --glass-edge: rgba(255, 255, 255, .6);
+  --glass-sheen: rgba(255, 255, 255, .3);
   --title-fill: #ffd23f;              /* the logo's yellow */
   --title-stroke: #1b2a5c;            /* the logo's navy outline */
-  --veil-soft: rgba(255,253,247,.55);
   --on-scrim: #ffffff;
   --shadow: 0 10px 30px rgba(29,39,71,.10);
   --font-display: "Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
@@ -31,13 +32,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0e1630; --sky-2: #1a2347; --card: #172042; --ink: #f4f1e6; --muted: #aab4d2;
-    --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff; --veil: rgba(23,32,66,.86); --veil-soft: rgba(23,32,66,.5);
+    --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff; --glass: rgba(23, 32, 66, .58); --glass-edge: rgba(255, 255, 255, .18); --glass-sheen: rgba(255, 255, 255, .08);
     --shadow: 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0e1630; --sky-2: #1a2347; --card: #172042; --ink: #f4f1e6; --muted: #aab4d2;
-  --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff; --veil: rgba(23,32,66,.86); --veil-soft: rgba(23,32,66,.5);
+  --royal: #8aa8ff; --fill: #3c62d4; --gold: #f3b83c; --ring: #2c3a66; --glow: rgba(243,184,60,.40); --hl: rgba(243,184,60,.14); --scrim: rgba(4,8,20,.92); --on-scrim: #ffffff; --glass: rgba(23, 32, 66, .58); --glass-edge: rgba(255, 255, 255, .18); --glass-sheen: rgba(255, 255, 255, .08);
   --shadow: 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
 }
 
@@ -59,52 +60,57 @@ body {
   gap: 28px;
 }
 
-/* ---------- header: a store-page banner ---------- */
-.hero { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); position: relative; }
-.banner { position: relative; aspect-ratio: 1794 / 876; border-radius: 28px 28px 0 0; overflow: hidden; background: var(--bg); }
-.banner-img {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%;
-  animation: bannerzoom calc(var(--step) * 2) ease-in-out infinite alternate;
+/* ---------- header: key art behind one liquid-glass panel (the site's own glass recipe) ---------- */
+.hero {
+  position: relative; display: flex; align-items: center; min-height: 560px;
+  border-radius: 28px; overflow: hidden; background: var(--bg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .12);
 }
-@keyframes bannerzoom { from { transform: scale(1); } to { transform: scale(1.05); } }
-.banner::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, var(--veil) 0%, var(--veil-soft) 30%, transparent 52%);
+.hero-art, .hero-print { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; }
+/* wide screens: the portrait video is shown whole on the right, and blurred to fill the rest */
+.hero-bg { filter: blur(26px) saturate(1.25) brightness(1.04); transform: scale(1.15); }
+.hero-fit {
+  position: absolute; z-index: 1; top: 24px; right: 24px; height: calc(100% - 48px); width: auto; aspect-ratio: 9 / 16;
+  object-fit: cover; border-radius: 22px; border: 3px solid var(--gold); box-shadow: 0 18px 44px rgba(0, 0, 0, .3); background: var(--bg);
 }
-.banner-text { position: absolute; left: 0; top: 0; bottom: 0; z-index: 1; width: 47%; padding: 40px 0 40px 40px; display: grid; align-content: center; }
-.eyebrow {
-  font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--gold); margin: 0 0 4px;
+.hero-print { display: none; }
+.glass {
+  position: relative; z-index: 1; margin: 24px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 0; align-items: stretch;
+  width: min(100% - 48px - 340px, 620px);
+  padding: 0;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  border-radius: 22px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .22), inset 0 1px 1px var(--glass-edge);
+  overflow: hidden;
 }
+.glass::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, var(--glass-sheen), transparent 40%);
+}
+.glass > * { position: relative; z-index: 1; }
+.glass-body { display: grid; gap: 8px; min-width: 0; align-content: center; padding: 22px 24px; }
+.icon-cell { display: grid; place-items: center; padding: 22px 0 22px 22px; }
+.app-icon { width: 100%; max-width: 180px; aspect-ratio: 1; border-radius: 24%; border: 2px solid var(--glass-edge); box-shadow: 0 14px 30px rgba(0, 0, 0, .3); }
 h1 {
-  font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.12;
-  margin: 0 0 14px; color: var(--title-fill); text-wrap: balance; letter-spacing: .01em;
+  font-family: var(--font-display); font-weight: 800; font-size: 38px; line-height: 1.02;
+  margin: 0; color: var(--title-fill); letter-spacing: .01em;
   text-shadow:
     3px 0 0 var(--title-stroke), -3px 0 0 var(--title-stroke), 0 3px 0 var(--title-stroke), 0 -3px 0 var(--title-stroke),
     2px 2px 0 var(--title-stroke), -2px 2px 0 var(--title-stroke), 2px -2px 0 var(--title-stroke), -2px -2px 0 var(--title-stroke),
-    0 6px 0 var(--title-stroke), 2px 5px 0 var(--title-stroke), -2px 5px 0 var(--title-stroke),
-    0 10px 16px rgba(0, 0, 0, .28);
+    0 5px 0 var(--title-stroke), 2px 4px 0 var(--title-stroke), -2px 4px 0 var(--title-stroke),
+    0 8px 14px rgba(0, 0, 0, .25);
 }
-.lede { margin: 0; color: var(--ink); font-size: 18px; max-width: 30ch; }
-.nw { display: inline-block; white-space: nowrap; }
-.store-bar {
-  display: grid; grid-template-columns: 88px minmax(0, 1fr) auto; gap: 18px; align-items: start;
-  padding: 18px 28px 22px;
-}
-.app-icon { width: 88px; height: 88px; border-radius: 22px; box-shadow: var(--shadow); border: 3px solid var(--card); margin-top: -46px; position: relative; z-index: 2; }
-.app-meta { display: grid; gap: 2px; padding-top: 2px; }
-.app-meta strong { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1.1; color: var(--ink); }
-.app-meta span { color: var(--muted); font-size: 15px; }
-.store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 10px; }
+.tagline { margin: 2px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.15; color: var(--ink); }
+.lede { margin: 0; color: var(--ink); font-size: 15.5px; line-height: 1.45; opacity: .92; }
+.store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
 .badge-slot { display: block; line-height: 0; }
-.badge-slot img { display: block; height: 44px; width: auto; }
-.soon { font-family: var(--font-display); font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
-.splash-wrap { width: 190px; max-width: 100%; margin-top: -150px; position: relative; z-index: 2; }
-.splash, .splash-print {
-  display: block; width: 100%; aspect-ratio: 9 / 16; border-radius: 22px; object-fit: cover;
-  border: 4px solid var(--gold); box-shadow: 0 14px 34px rgba(29,39,71,.28); background: var(--bg);
-}
-.splash-print { display: none; }
+.badge-slot img { display: block; height: 40px; width: auto; }
+.soon { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
 
 /* ---------- the loop ---------- */
 .loop {
@@ -491,18 +497,17 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   .peers li.us { grid-column: 1 / -1; }
 }
 @media screen and (max-width: 640px) {
-  .banner { aspect-ratio: auto; overflow: visible; background: none; }
-  .banner-img { position: static; display: block; aspect-ratio: 4 / 3; height: auto; object-position: 62% 50%; border-radius: 28px 28px 0 0; animation: none; }
-  .banner::after { display: none; }
-  .banner-text { position: static; width: auto; padding: 18px 18px 0; text-align: center; justify-items: center; }
-  .hero h1 { font-size: 32px; }
-  .lede { margin-inline: auto; font-size: 16px; }
-  .store-bar { grid-template-columns: 64px minmax(0, 1fr); padding: 16px 16px 20px; gap: 12px; }
-  .app-icon { width: 64px; height: 64px; border-radius: 16px; margin-top: 0; }
-  .app-meta strong { font-size: 20px; }
-  .badge-slot img { height: 38px; }
-  .store-badges { gap: 8px; }
-  .splash-wrap { grid-column: 1 / -1; justify-self: center; width: 200px; margin-top: 6px; }
+  .hero { flex-direction: column; align-items: stretch; min-height: 0; overflow: visible; background: none; box-shadow: none; }
+  .hero-art { position: relative; height: auto; aspect-ratio: 4 / 5; object-position: 50% 40%; border-radius: 28px; filter: none; transform: none; }
+  .hero-fit { display: none; }
+  .glass { width: auto; }
+  .glass { margin: -56px 12px 0; width: auto; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+  .glass-body { padding: 14px 14px 16px; gap: 6px; }
+  .icon-cell { padding: 16px 0 14px 14px; place-items: start center; }
+  .hero h1 { font-size: 26px; }
+  .tagline { font-size: 17px; }
+  .lede { font-size: 14px; }
+  .badge-slot img { height: 34px; }
   .loop { padding: 20px 14px 24px; }
   .legend li { padding: 8px 10px; column-gap: 12px; grid-template-columns: 34px 1fr; }
   .legend .badge { width: 34px; height: 34px; font-size: 17px; }
@@ -572,11 +577,11 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   /* a compact desktop layout sized for A4 portrait: page 1 the bet, page 2 the loop, page 3 islands, screens, hooks */
   h1 { font-size: 34px; }
   .lede { font-size: 15px; }
-  .banner-img { animation: none; }
-  .splash-wrap { width: 120px; margin-top: -90px; }
-  .store-bar { padding: 12px 18px 14px; }
-  .splash { display: none !important; }
-  .splash-print { display: block; }
+  .hero { min-height: 380px; }
+  .hero-art, .hero-fit { display: none !important; }
+  .hero-print { display: block; }
+  .glass { background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: none; backdrop-filter: none; width: min(100% - 32px, 520px); margin: 16px; }
+  .hero h1 { font-size: 30px; }
   .bet, .loop, .adv, .shots { padding: 16px 18px 18px; gap: 12px; }
   .sec-head h2, .loop-title { font-size: 21px; }
   .bet-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
@@ -627,30 +632,24 @@ html.export .node.is-selected .art { border-color: var(--ring); }
 
 <main class="poster">
   <header class="hero">
-    <div class="banner">
-      <img class="banner-img" src="img/keyart.jpg" alt="The Queen and her dragon in front of the kingdom">
-      <div class="banner-text">
-        <p class="eyebrow">Merge Crown</p>
-        <h1><span class="nw">Merge. Deliver.</span> <span class="nw">Build a kingdom.</span></h1>
-        <p class="lede">A relaxing merge puzzle where every match helps the Queen grow her town.</p>
-      </div>
-    </div>
-    <div class="store-bar">
-      <img class="app-icon" src="img/appicon.png" alt="Merge Crown app icon">
-      <div class="app-meta">
-        <strong>Merge Crown</strong>
-        <span>Merge puzzle &middot; Kingdom builder</span>
+    <video class="hero-art hero-bg" autoplay muted loop playsinline preload="auto" poster="img/hero-poster.jpg" aria-hidden="true">
+      <source src="hero.mp4" type="video/mp4">
+    </video>
+    <video class="hero-fit" autoplay muted loop playsinline preload="auto" poster="img/hero-poster.jpg" aria-label="The Queen flies her dragon over the kingdom">
+      <source src="hero.mp4" type="video/mp4">
+    </video>
+    <img class="hero-print" src="img/hero-poster.jpg" alt="">
+    <div class="glass">
+      <div class="icon-cell"><img class="app-icon" src="img/appicon.png" alt="Merge Crown app icon"></div>
+      <div class="glass-body">
+        <h1>Merge Crown</h1>
+        <p class="tagline">Merge. Deliver. Build a kingdom.</p>
+        <p class="lede">A relaxing merge puzzle where every match helps the Queen grow her kingdom.</p>
         <div class="store-badges" aria-label="Store links coming soon">
           <span class="badge-slot" title="Google Play link coming soon"><img src="img/google-play.svg" alt="Get it on Google Play (coming soon)"></span>
           <span class="badge-slot" title="App Store link coming soon"><img src="img/app-store.svg" alt="Download on the App Store (coming soon)"></span>
-          <span class="soon">Coming soon</span>
         </div>
-      </div>
-      <div class="splash-wrap">
-        <video class="splash" autoplay muted loop playsinline preload="auto" poster="img/header-poster.jpg" aria-label="The Queen flies her dragon over the kingdom">
-          <source src="header.mp4" type="video/mp4">
-        </video>
-        <img class="splash-print" src="img/header-poster.jpg" alt="">
+        <p class="soon">Coming soon to both stores</p>
       </div>
     </div>
   </header>
