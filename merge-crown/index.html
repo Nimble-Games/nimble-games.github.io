@@ -104,6 +104,10 @@ h1 {
 .badge-slot { display: block; line-height: 0; }
 .badge-slot img { display: block; height: 40px; width: auto; }
 .soon { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.soon a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+a.badge-slot { border-radius: 8px; transition: transform .15s ease; }
+a.badge-slot:hover { transform: translateY(-1px); }
+a.badge-slot:focus-visible, .soon a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 
 
 /* ---------- the loop ---------- */
@@ -574,6 +578,7 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   .hero { aspect-ratio: 16 / 9; }
   .hero-art { display: none !important; }
   .hero-print { display: block; }
+  .soon a::after { content: " \2014  testflight.apple.com/join/yH1dFK1n"; text-transform: none; letter-spacing: .02em; }
   .glass { background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: none; backdrop-filter: none; width: min(100% - 32px, 520px); margin: 16px; }
   .hero h1 { font-size: 30px; }
   .bet, .loop, .adv, .shots { padding: 16px 18px 18px; gap: 12px; }
@@ -636,11 +641,11 @@ html.export .node.is-selected .art { border-color: var(--ring); }
         <h1>Merge Crown</h1>
         <p class="tagline">Merge. Deliver. Build a kingdom.</p>
         <p class="lede">A relaxing merge puzzle where every match helps the Queen grow her kingdom.</p>
-        <div class="store-badges" aria-label="Store links coming soon">
+        <div class="store-badges" aria-label="Store links">
           <span class="badge-slot" title="Google Play link coming soon"><img src="img/google-play.svg" alt="Get it on Google Play (coming soon)"></span>
-          <span class="badge-slot" title="App Store link coming soon"><img src="img/app-store.svg" alt="Download on the App Store (coming soon)"></span>
+          <a class="badge-slot" href="https://testflight.apple.com/join/yH1dFK1n" target="_blank" rel="noopener" title="Join the iOS beta on TestFlight"><img src="img/app-store.svg" alt="iOS: join the beta on TestFlight"></a>
         </div>
-        <p class="soon">Coming soon to both stores</p>
+        <p class="soon">iOS beta open on <a href="https://testflight.apple.com/join/yH1dFK1n" target="_blank" rel="noopener">TestFlight</a> · Google Play coming soon</p>
       </div>
     </div>
   </header>
