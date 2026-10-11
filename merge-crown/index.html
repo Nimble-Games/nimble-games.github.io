@@ -62,22 +62,16 @@ body {
 
 /* ---------- header: key art behind one liquid-glass panel (the site's own glass recipe) ---------- */
 .hero {
-  position: relative; display: flex; align-items: center; min-height: 560px;
+  position: relative; display: flex; align-items: flex-end; justify-content: flex-start; aspect-ratio: 16 / 9;
   border-radius: 28px; overflow: hidden; background: var(--bg);
   box-shadow: 0 24px 60px rgba(0, 0, 0, .12);
 }
-.hero-art, .hero-print { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; }
-/* wide screens: the portrait video is shown whole on the right, and blurred to fill the rest */
-.hero-bg { filter: blur(26px) saturate(1.25) brightness(1.04); transform: scale(1.15); }
-.hero-fit {
-  position: absolute; z-index: 1; top: 24px; right: 24px; height: calc(100% - 48px); width: auto; aspect-ratio: 9 / 16;
-  object-fit: cover; border-radius: 22px; border: 3px solid var(--gold); box-shadow: 0 18px 44px rgba(0, 0, 0, .3); background: var(--bg);
-}
+.hero-art, .hero-print { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 .hero-print { display: none; }
 .glass {
   position: relative; z-index: 1; margin: 24px;
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 0; align-items: stretch;
-  width: min(100% - 48px - 340px, 620px);
+  width: min(100% - 48px, 520px);
   padding: 0;
   background: var(--glass);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -94,7 +88,7 @@ body {
 .glass > * { position: relative; z-index: 1; }
 .glass-body { display: grid; gap: 8px; min-width: 0; align-content: center; padding: 22px 24px; }
 .icon-cell { display: grid; place-items: center; padding: 22px 0 22px 22px; }
-.app-icon { width: 100%; max-width: 180px; aspect-ratio: 1; border-radius: 24%; border: 2px solid var(--glass-edge); box-shadow: 0 14px 30px rgba(0, 0, 0, .3); }
+.app-icon { width: 100%; max-width: 160px; aspect-ratio: 1; border-radius: 24%; border: 2px solid var(--glass-edge); box-shadow: 0 14px 30px rgba(0, 0, 0, .3); }
 h1 {
   font-family: var(--font-display); font-weight: 800; font-size: 38px; line-height: 1.02;
   margin: 0; color: var(--title-fill); letter-spacing: .01em;
@@ -498,10 +492,10 @@ html.export .node.is-selected .art { border-color: var(--ring); }
 }
 @media screen and (max-width: 640px) {
   .hero { flex-direction: column; align-items: stretch; min-height: 0; overflow: visible; background: none; box-shadow: none; }
-  .hero-art { position: relative; height: auto; aspect-ratio: 4 / 5; object-position: 50% 40%; border-radius: 28px; filter: none; transform: none; }
-  .hero-fit { display: none; }
-  .glass { width: auto; }
-  .glass { margin: -56px 12px 0; width: auto; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+  .hero { aspect-ratio: auto; }
+  .hero-art { position: relative; height: auto; aspect-ratio: 16 / 9; border-radius: 22px; }
+  .glass { width: auto; margin-top: -34px; }
+  .glass { margin: -34px 12px 0; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
   .glass-body { padding: 14px 14px 16px; gap: 6px; }
   .icon-cell { padding: 16px 0 14px 14px; place-items: start center; }
   .hero h1 { font-size: 26px; }
@@ -577,8 +571,8 @@ html.export .node.is-selected .art { border-color: var(--ring); }
   /* a compact desktop layout sized for A4 portrait: page 1 the bet, page 2 the loop, page 3 islands, screens, hooks */
   h1 { font-size: 34px; }
   .lede { font-size: 15px; }
-  .hero { min-height: 380px; }
-  .hero-art, .hero-fit { display: none !important; }
+  .hero { aspect-ratio: 16 / 9; }
+  .hero-art { display: none !important; }
   .hero-print { display: block; }
   .glass { background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: none; backdrop-filter: none; width: min(100% - 32px, 520px); margin: 16px; }
   .hero h1 { font-size: 30px; }
@@ -632,10 +626,7 @@ html.export .node.is-selected .art { border-color: var(--ring); }
 
 <main class="poster">
   <header class="hero">
-    <video class="hero-art hero-bg" autoplay muted loop playsinline preload="auto" poster="img/hero-poster.jpg" aria-hidden="true">
-      <source src="hero.mp4" type="video/mp4">
-    </video>
-    <video class="hero-fit" autoplay muted loop playsinline preload="auto" poster="img/hero-poster.jpg" aria-label="The Queen flies her dragon over the kingdom">
+    <video class="hero-art" autoplay muted loop playsinline preload="auto" poster="img/hero-poster.jpg" aria-label="The Queen flies her dragon over the kingdom">
       <source src="hero.mp4" type="video/mp4">
     </video>
     <img class="hero-print" src="img/hero-poster.jpg" alt="">
