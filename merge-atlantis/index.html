@@ -1,0 +1,1059 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex, nofollow"><meta name="description" content="A cosy underwater merge game where nothing you make is taken away: the bet, the core loop and screens from the prototype."><meta name="theme-color" content="#0f86ad"><meta property="og:type" content="website"><meta property="og:url" content="https://nimble.gs/merge-atlantis/"><meta property="og:title" content="Merge Atlantis — the core loop"><meta property="og:description" content="A cosy underwater merge game where nothing you make is taken away: the bet, the core loop and screens from the prototype."><meta property="og:image" content="https://nimble.gs/merge-atlantis/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="img/appicon.webp"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Merge Atlantis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* The Merge Crown investor page's layout, re-themed for the sea: one poster column of cards.
+   Header art behind one liquid-glass panel, the bet, goals-not-orders, the loop ring, the aquarium,
+   the creatures, screens, status, and why players come back. */
+:root {
+  --bg: #def3f8;          /* shallow water */
+  --sky-2: #fbf2dc;       /* sand */
+  --card: #fffdf7;        /* pearl */
+  --ink: #0d3149;         /* deep-sea navy */
+  --muted: #4c6b7d;
+  --royal: #0b7ea3;       /* lagoon teal */
+  --fill: #0f86ad;        /* teal behind white text */
+  --gold: #e8792f;        /* coral */
+  --ring: #bfe0ea;
+  --glow: rgba(232,121,47,.40);
+  --hl: rgba(232,121,47,.14);
+  --ok: #3f9e3a;          /* the kit's green action */
+  --scrim: rgba(4,22,34,.9);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-edge: rgba(255, 255, 255, .62);
+  --glass-sheen: rgba(255, 255, 255, .3);
+  --on-scrim: #ffffff;
+  --shadow: 0 10px 30px rgba(13,49,73,.10);
+  --font-display: "Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --step: 2.4s;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #06202f; --sky-2: #0b2d40; --card: #0f3045; --ink: #eef8fb; --muted: #9fc4d3;
+    --royal: #5fd0ee; --fill: #137fa3; --gold: #ff9a55; --ring: #1f4d63; --glow: rgba(255,154,85,.38); --hl: rgba(255,154,85,.13);
+    --ok: #6cc65c; --scrim: rgba(2,12,20,.93); --glass: rgba(10, 40, 58, .6); --glass-edge: rgba(255, 255, 255, .18); --glass-sheen: rgba(255, 255, 255, .08);
+    --shadow: 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #06202f; --sky-2: #0b2d40; --card: #0f3045; --ink: #eef8fb; --muted: #9fc4d3;
+  --royal: #5fd0ee; --fill: #137fa3; --gold: #ff9a55; --ring: #1f4d63; --glow: rgba(255,154,85,.38); --hl: rgba(255,154,85,.13);
+  --ok: #6cc65c; --scrim: rgba(2,12,20,.93); --glass: rgba(10, 40, 58, .6); --glass-edge: rgba(255, 255, 255, .18); --glass-sheen: rgba(255, 255, 255, .08);
+  --shadow: 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--sky-2) 100%) fixed, var(--bg);
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  padding-inline: 16px;
+  padding-block: 24px 40px;
+}
+.poster { max-width: 980px; margin: 0 auto; display: grid; gap: 28px; }
+
+/* ---------- header: the first area, decorated, behind one liquid-glass panel ---------- */
+.hero {
+  position: relative; display: flex; align-items: flex-end; justify-content: flex-end; aspect-ratio: 16 / 9;
+  border-radius: 28px; overflow: hidden; background: #8fd6e6;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .12);
+}
+.hero-art, .hero-print { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+.hero-print { display: none; }
+.scene { position: absolute; inset: 0; overflow: hidden; }
+.scene > .plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+.scene .shafts {
+  position: absolute; inset: -10% 0 0; pointer-events: none; mix-blend-mode: screen; opacity: .55;
+  background: repeating-linear-gradient(100deg, transparent 0 7%, rgba(255,255,255,.22) 8% 10%, transparent 11% 19%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 70%); mask-image: linear-gradient(180deg, #000 0%, transparent 70%);
+  animation: shimmer 9s ease-in-out infinite alternate;
+}
+@keyframes shimmer { from { transform: translateX(-3%); opacity: .4; } to { transform: translateX(3%); opacity: .65; } }
+.scene .piece { position: absolute; transform: translate(-50%, -100%); filter: drop-shadow(0 6px 6px rgba(40,60,40,.22)); }
+.scene .swim { position: absolute; transform: translate(-50%, -50%); animation: bob 5s ease-in-out infinite; filter: drop-shadow(0 10px 10px rgba(0,40,70,.18)); }
+.scene .swim.j { animation-duration: 6.4s; animation-delay: -2s; }
+@keyframes bob { 0%,100% { margin-top: 0; rotate: -3deg; } 50% { margin-top: -2.2%; rotate: 3deg; } }
+.bubble {
+  position: absolute; bottom: -4%; width: 1.1%; aspect-ratio: 1; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.75); background: rgba(255,255,255,.15);
+  animation: rise 7s linear infinite; opacity: 0;
+}
+@keyframes rise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: .9; } 50% { transform: translateY(-260%) translateX(12px); } 90% { opacity: .8; } 100% { transform: translateY(-560%) translateX(-6px); opacity: 0; } }
+.glass {
+  position: relative; z-index: 1; margin: 24px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 0; align-items: stretch;
+  width: min(100% - 48px, 520px);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  border-radius: 22px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .22), inset 0 1px 1px var(--glass-edge);
+  overflow: hidden;
+}
+.glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(180deg, var(--glass-sheen), transparent 40%); }
+.glass > * { position: relative; z-index: 1; }
+.glass-body { display: grid; gap: 8px; min-width: 0; align-content: center; padding: 20px 24px 22px; }
+.icon-cell { display: grid; place-items: center; padding: 22px 0 22px 22px; }
+.app-icon { width: 100%; max-width: 160px; aspect-ratio: 1; border-radius: 24%; border: 2px solid var(--glass-edge); box-shadow: 0 14px 30px rgba(0, 0, 0, .3); object-fit: cover; }
+h1 { margin: 0; line-height: 0; }
+h1 img { width: 100%; max-width: 270px; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,.2)); }
+.tagline { margin: 2px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.15; color: var(--ink); }
+.lede { margin: 0; color: var(--ink); font-size: 15.5px; line-height: 1.45; opacity: .92; }
+.status-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 5px; border-radius: 999px;
+  background: var(--fill); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 14px; line-height: 1;
+}
+.pill i { width: 8px; height: 8px; border-radius: 50%; background: #9df07f; box-shadow: 0 0 0 3px rgba(157,240,127,.3); }
+.soon { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- shared card + section head ---------- */
+.card { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); }
+.sec-head { text-align: center; display: grid; gap: 2px; justify-items: center; }
+.kicker { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.sec-head h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 26px; line-height: 1.1; color: var(--ink); }
+.sec-head p { margin: 2px 0 0; color: var(--muted); font-size: 16px; max-width: 60ch; }
+
+/* ---------- the bet ---------- */
+.bet { padding: 24px 28px 28px; display: grid; gap: 18px; }
+.bet-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 28px; align-items: center; }
+.hyp { display: grid; gap: 12px; }
+.hyp-label { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.hyp-text { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(22px, 3vw, 30px); line-height: 1.15; color: var(--royal); text-wrap: balance; border-left: 6px solid var(--gold); padding-left: 14px; }
+.how { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.how li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; font-size: 16px; color: var(--ink); }
+.how li b { font-weight: 800; }
+.how .tick { width: 28px; height: 28px; border-radius: 50%; background: var(--fill); color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 15px; }
+.pass { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+.pass b { color: var(--ink); }
+.map { margin: 0; }
+.map svg { width: 100%; height: auto; display: block; overflow: visible; }
+.map .quad { fill: var(--bg); }
+.map .goal { fill: var(--hl); stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.map .axis { stroke: var(--muted); stroke-width: 1.5; }
+.map .axis-label { fill: var(--muted); font-family: var(--font-body); font-size: 12px; font-weight: 700; }
+.map .goal-label { fill: var(--gold); font-family: var(--font-display); font-size: 13px; font-weight: 800; letter-spacing: .06em; }
+.map .peer { fill: var(--muted); }
+.map .peer-label { fill: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+.map .us-label { fill: var(--royal); font-family: var(--font-display); font-weight: 800; font-size: 17px; }
+.map .move { fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-dasharray: 6 5; animation: march 1.2s linear infinite; }
+.map .move-head { fill: var(--gold); }
+@keyframes march { to { stroke-dashoffset: -11; } }
+.map .pulse { fill: none; stroke: var(--gold); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ping calc(var(--step) * 5 / 4) ease-out infinite; }
+@keyframes ping { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(2.1); opacity: 0; } }
+.peers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.peers li { background: var(--bg); border-radius: 16px; padding: 12px 12px 14px; display: grid; gap: 4px; align-content: start; }
+.peers li.us { background: var(--fill); }
+.peers h4 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 17px; line-height: 1.1; color: var(--ink); }
+.peers .type { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+.peers p { margin: 0; font-size: 14px; color: var(--muted); }
+.peers li.us h4, .peers li.us p { color: #fff; }
+.peers li.us .type { color: #ffd9a8; }
+.map-note { margin: -6px 0 0; text-align: center; font-size: 13px; color: var(--muted); }
+
+/* ---------- goals, not orders ---------- */
+.swap { padding: 24px 28px 28px; display: grid; gap: 18px; }
+.lanes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.lane { background: var(--bg); border-radius: 22px; padding: 16px 16px 18px; display: grid; gap: 10px; align-content: start; }
+.lane.ours { box-shadow: inset 0 0 0 2px var(--royal); }
+.lane h3 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; color: var(--ink); }
+.lane .lane-type { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lane.ours .lane-type { color: var(--royal); }
+.track { position: relative; height: 128px; border-radius: 16px; background: var(--card); overflow: hidden; }
+.track .item { position: absolute; left: 6%; top: 50%; width: 64px; transform: translateY(-50%); }
+.track .dest { position: absolute; right: 5%; top: 50%; transform: translateY(-50%); display: grid; justify-items: center; gap: 4px; }
+.order-card {
+  width: 96px; padding: 8px 6px 6px; border-radius: 14px; background: #f3e7cc; border: 2px solid #d9c391; text-align: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 13px; color: #6b5527;
+}
+.order-card img { width: 40px; display: block; margin: 0 auto 2px; opacity: .55; }
+.gone { font-family: var(--font-display); font-weight: 800; font-size: 14px; color: #b0492c; opacity: 0; animation: gone 6s infinite; }
+.lane.theirs .item { animation: toorder 6s infinite; }
+@keyframes toorder { 0%,12% { left: 6%; opacity: 1; transform: translateY(-50%) scale(1); } 40% { left: 66%; opacity: 1; transform: translateY(-50%) scale(.8); } 50%,92% { left: 66%; opacity: 0; transform: translateY(-50%) scale(.3); } 100% { left: 6%; opacity: 0; } }
+@keyframes gone { 0%,48% { opacity: 0; } 55%,88% { opacity: 1; } 96%,100% { opacity: 0; } }
+.goal-card {
+  position: absolute; left: 30%; top: 14px; display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: center;
+  padding: 7px 10px; border-radius: 14px; background: #fff7e6; border: 2px solid #e9d3a2;
+  font-family: var(--font-display); font-weight: 800; font-size: 13px; color: #5a4a26; line-height: 1.1;
+}
+.goal-card img { width: 34px; }
+.goal-card .bar { display: block; height: 7px; margin-top: 4px; border-radius: 6px; background: #e8dcc0; overflow: hidden; }
+.goal-card .bar b { display: block; height: 100%; width: 0; background: var(--ok); animation: fillbar 6s infinite; }
+@keyframes fillbar { 0%,22% { width: 0; } 34%,90% { width: 100%; } 100% { width: 0; } }
+.goal-card .done { color: var(--ok); opacity: 0; animation: gone 6s infinite; animation-delay: -1.3s; }
+.lane.ours .item { animation: stays 6s infinite; }
+@keyframes stays { 0%,10% { transform: translateY(-50%) scale(1); } 22% { transform: translateY(-58%) scale(1.15); } 30%,52% { transform: translateY(-50%) scale(1); left: 6%; opacity: 1; } 72%,90% { left: 70%; transform: translateY(-30%) scale(.9); opacity: 1; } 96%,100% { left: 6%; opacity: 0; } }
+.lane.ours .dest img { width: 72px; }
+.dest-label { font-family: var(--font-display); font-weight: 800; font-size: 13px; color: var(--royal); }
+.lane ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.lane li { position: relative; padding-left: 20px; font-size: 15px; color: var(--ink); }
+.lane li::before { content: ""; position: absolute; left: 4px; top: .55em; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.lane.ours li::before { background: var(--gold); }
+
+/* ---------- the loop ---------- */
+.loop { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); padding: 24px 28px 28px; display: grid; gap: 14px; }
+.loop-title { font-family: var(--font-display); font-weight: 800; font-size: 24px; margin: 4px 0 0; color: var(--ink); text-align: center; }
+.loop-body { display: grid; grid-template-columns: minmax(0, 470px) minmax(0, 1fr); align-items: center; gap: 36px; }
+.stage { position: relative; width: 100%; max-width: 470px; aspect-ratio: 1; justify-self: center; }
+.ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ring .track-c { fill: none; stroke: var(--ring); stroke-width: .9; stroke-dasharray: 1.6 1.6; }
+.ring .arc { fill: none; stroke: var(--gold); stroke-width: 1.1; stroke-linecap: round; }
+.ring .head-mark { fill: var(--gold); }
+.node { position: absolute; left: var(--x); top: var(--y); width: 22%; aspect-ratio: 1; transform: translate(-50%, -50%); }
+.art {
+  width: 100%; height: 100%; border-radius: 50%; background: var(--bg); border: 4px solid var(--ring);
+  display: grid; place-items: center; position: relative;
+  animation: focus calc(var(--step) * 5) infinite; animation-delay: calc(var(--step) * var(--i) - .25s);
+}
+.art > img { max-width: 72%; max-height: 72%; }
+.num {
+  position: absolute; top: -4%; left: -4%; width: 30%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--fill); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: clamp(12px, 2.4vw, 16px);
+  display: grid; place-items: center; border: 3px solid var(--card);
+}
+.tag {
+  position: absolute; left: 50%; bottom: -14%; transform: translateX(-50%); white-space: nowrap;
+  background: var(--fill); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: clamp(11px, 2.2vw, 14px);
+  line-height: 1; padding: 5px 10px 4px; border-radius: 999px; border: 2px solid var(--card);
+}
+@keyframes focus {
+  0%   { transform: scale(1);    border-color: var(--ring); box-shadow: 0 0 0 0 transparent; }
+  4%   { transform: scale(1.12); border-color: var(--gold); box-shadow: 0 0 0 8px var(--glow); }
+  17%  { transform: scale(1.12); border-color: var(--gold); box-shadow: 0 0 0 8px var(--glow); }
+  22%  { transform: scale(1);    border-color: var(--ring); box-shadow: 0 0 0 0 transparent; }
+  100% { transform: scale(1);    border-color: var(--ring); box-shadow: 0 0 0 0 transparent; }
+}
+/* step 2: two pearls slide together and become a better one */
+.merge { position: relative; width: 82%; aspect-ratio: 84 / 70; }
+.merge img { position: absolute; }
+.merge .a, .merge .b { width: 42%; top: 28%; animation: slide calc(var(--step) * 5) infinite; animation-delay: var(--step); }
+.merge .a { left: 0; }
+.merge .b { right: 0; animation-name: slide-b; }
+.merge .out { width: 70%; left: 15%; top: 4%; opacity: 0; animation: pop calc(var(--step) * 5) infinite; animation-delay: var(--step); }
+@keyframes slide   { 0%,3% { transform: translateX(0); opacity: 1; } 9% { transform: translateX(62%); opacity: 0; } 92% { opacity: 0; transform: translateX(0); } 100% { opacity: 1; } }
+@keyframes slide-b { 0%,3% { transform: translateX(0); opacity: 1; } 9% { transform: translateX(-62%); opacity: 0; } 92% { opacity: 0; transform: translateX(0); } 100% { opacity: 1; } }
+@keyframes pop     { 0%,8% { opacity: 0; transform: scale(.4); } 12% { opacity: 1; transform: scale(1.12); } 15%,90% { opacity: 1; transform: scale(1); } 95%,100% { opacity: 0; transform: scale(.4); } }
+/* step 1: a pearl pops out of the harvested kelp */
+.reward { position: absolute; width: 30%; opacity: 0; animation: reward calc(var(--step) * 5) infinite; }
+.reward.c { right: -6%; top: 4%; }
+@keyframes reward { 0%,3% { opacity: 0; transform: translateY(10px) scale(.6); } 8% { opacity: 1; transform: translateY(-4px) scale(1.05); } 16% { opacity: 1; transform: translateY(-8px) scale(1); } 21%,100% { opacity: 0; transform: translateY(-16px); } }
+.center { position: absolute; left: 50%; top: 50%; width: 30%; aspect-ratio: 1; transform: translate(-50%, -50%); }
+.center img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background: var(--bg); border: 5px solid var(--gold); }
+.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.legend li {
+  display: grid; grid-template-columns: 40px 1fr; column-gap: 14px; align-items: center; padding: 10px 14px; border-radius: 16px;
+  animation: row calc(var(--step) * 5) infinite; animation-delay: calc(var(--step) * var(--i) - .25s);
+}
+.legend .badge { grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; background: var(--fill); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 20px; display: grid; place-items: center; }
+.legend h3 { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1.1; margin: 0; color: var(--ink); }
+.legend p { margin: 0; font-size: 16px; color: var(--muted); }
+@keyframes row { 0% { background: transparent; } 4%, 17% { background: var(--hl); } 22%, 100% { background: transparent; } }
+.repeat { margin: 4px 0 0; text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--royal); text-wrap: balance; }
+.repeat span { display: inline-block; animation: spin calc(var(--step) * 5) linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+html.export .hint { display: none; }
+.print-details { display: none; }
+
+/* ---------- tap a step for more ---------- */
+.node, .legend li { cursor: pointer; }
+.node:focus-visible, .legend li:focus-visible { outline: 3px solid var(--royal); outline-offset: 4px; border-radius: 50%; }
+.legend li:focus-visible { border-radius: 16px; }
+.node.is-selected .art { border-color: var(--royal); }
+.legend li.is-selected { box-shadow: inset 0 0 0 2px var(--royal); }
+.hint { margin: -6px 0 0; text-align: center; color: var(--muted); font-size: 14px; }
+.detail { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 20px; align-items: start; background: var(--bg); border-radius: 22px; padding: 16px; border: 2px solid var(--ring); }
+.detail img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 14px; border: 3px solid var(--card); box-shadow: var(--shadow); max-width: 100%; }
+.detail .d-kicker { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+.detail h3 { margin: 2px 0 6px; font-family: var(--font-display); font-weight: 800; font-size: 26px; line-height: 1.1; color: var(--royal); }
+.detail p { margin: 0 0 10px; font-size: 16px; max-width: 62ch; }
+.detail ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.detail li { position: relative; padding-left: 22px; font-size: 15.5px; color: var(--ink); max-width: 62ch; }
+.detail li::before { content: ""; position: absolute; left: 4px; top: .55em; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); }
+.detail.swapin { animation: swapin .35s ease-out; }
+@keyframes swapin { from { opacity: .2; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- your aquarium ---------- */
+.kingdom { padding: 24px 28px 28px; display: grid; gap: 18px; }
+.kingdom-body { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+.tank { margin: 0; display: grid; gap: 10px; }
+.tank-view { position: relative; overflow: hidden; border-radius: 22px; aspect-ratio: 3 / 2; border: 4px solid var(--gold); background: #8fd6e6; box-shadow: var(--shadow); }
+.tank-view .scene > .plate { object-position: 50% 50%; }
+.tank figcaption { font-size: 15px; color: var(--muted); }
+.tank figcaption b { color: var(--ink); }
+.verbs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.verbs li { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; background: var(--bg); border-radius: 18px; padding: 10px 14px; animation: row calc(var(--step) * 5) infinite; }
+.verbs li:nth-child(1) { animation-delay: -.25s; }
+.verbs li:nth-child(2) { animation-delay: calc(var(--step) * 5 / 4 - .25s); }
+.verbs li:nth-child(3) { animation-delay: calc(var(--step) * 5 / 2 - .25s); }
+.verbs li:nth-child(4) { animation-delay: calc(var(--step) * 15 / 4 - .25s); }
+.verbs img { width: 64px; height: 64px; object-fit: contain; }
+.verbs h3 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.1; color: var(--ink); }
+.verbs p { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+.areas-head { margin: 4px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; text-align: center; color: var(--ink); }
+.areas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.areas li { display: grid; gap: 6px; align-content: start; }
+.area-art { position: relative; aspect-ratio: 3 / 2; border-radius: 16px; overflow: hidden; border: 3px solid var(--ring); background: #8fd6e6; }
+.area-art .plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.area-art .wonder { position: absolute; left: 50%; bottom: 6%; width: 52%; transform: translateX(-50%); filter: drop-shadow(0 6px 6px rgba(40,60,40,.25)); }
+.area-num { position: absolute; top: 6px; left: 6px; width: 26px; height: 26px; border-radius: 50%; background: var(--fill); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 14px; display: grid; place-items: center; border: 2px solid var(--card); }
+.areas h4 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 17px; line-height: 1.1; color: var(--ink); }
+.areas p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.areas .wname { color: var(--royal); font-weight: 800; }
+.decos { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 2px; margin: 0; padding: 0; list-style: none; }
+.decos img { width: 62px; height: 62px; object-fit: contain; }
+.decos li:nth-child(odd) img { animation: sway 4s ease-in-out infinite; }
+.decos li:nth-child(even) img { animation: sway 4s ease-in-out infinite reverse; }
+@keyframes sway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg) translateY(-2px); } }
+.footnote { margin: -4px 0 0; text-align: center; font-size: 13.5px; color: var(--muted); text-wrap: balance; }
+
+/* ---------- creatures ---------- */
+.adv { padding: 24px 28px 28px; display: grid; gap: 18px; }
+.adv-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.adv-steps li {
+  position: relative; display: grid; justify-items: center; text-align: center; gap: 4px; padding: 14px 10px 16px; border-radius: 20px;
+  animation: row calc(var(--step) * 5) infinite; animation-delay: calc(var(--step) * 5 / 4 * var(--j) - .25s);
+}
+.adv-steps li + li::before { content: ""; position: absolute; left: -12px; top: 62px; width: 10px; height: 10px; border-top: 3px solid var(--gold); border-right: 3px solid var(--gold); transform: rotate(45deg); }
+.adv-art { position: relative; width: 112px; height: 112px; display: grid; place-items: center; }
+.adv-art > img { max-width: 100%; max-height: 100%; }
+.adv-steps h3 { margin: 4px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.1; color: var(--ink); }
+.adv-steps p { margin: 0; font-size: 15px; color: var(--muted); max-width: 22ch; }
+.adv-art .bob { animation: bob 4s ease-in-out infinite; }
+.adv-art .mini { position: absolute; width: 40%; right: -4%; bottom: 0; animation: bob 3s ease-in-out infinite; }
+.adv-art .orb { position: absolute; width: 34%; left: -2%; top: 0; animation: orbup calc(var(--step) * 5 / 4) ease-in-out infinite; }
+@keyframes orbup { 0%,100% { transform: translateY(6px) scale(.9); } 50% { transform: translateY(-8px) scale(1.05); } }
+.spark { position: absolute; width: 12px; height: 12px; background: var(--gold); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); animation: twinkle calc(var(--step) * 5 / 4) ease-in-out infinite; }
+.spark.s1 { left: 6%; top: 16%; }
+.spark.s2 { right: 4%; top: 30%; animation-delay: calc(var(--step) * 5 / 12); }
+.spark.s3 { left: 30%; bottom: 4%; animation-delay: calc(var(--step) * 5 / 6); }
+@keyframes twinkle { 0%,100% { transform: scale(.2); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } }
+.bub { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--royal); opacity: 0; animation: bubup 2.4s ease-in infinite; }
+.bub.b1 { left: 30%; bottom: 30%; }
+.bub.b2 { left: 55%; bottom: 26%; animation-delay: .8s; width: 7px; height: 7px; }
+.bub.b3 { left: 70%; bottom: 36%; animation-delay: 1.6s; }
+@keyframes bubup { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .9; } 100% { transform: translateY(-60px); opacity: 0; } }
+
+/* ---------- screens ---------- */
+.shots { padding: 24px 28px 28px; display: grid; gap: 18px; }
+.shot-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; max-width: 760px; margin: 0 auto; width: 100%; }
+.shot-grid figure { margin: 0; display: grid; gap: 8px; justify-items: center; }
+.shot-grid img { width: 100%; max-width: 100%; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 16px; border: 3px solid var(--ring); box-shadow: var(--shadow); background: var(--bg); }
+.shot-grid figcaption { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--ink); text-align: center; line-height: 1.15; }
+.shot { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 16px; }
+.shot:focus-visible { outline: 3px solid var(--royal); outline-offset: 3px; }
+.shot img { display: block; transition: transform .2s ease; }
+.shot:hover img { transform: translateY(-3px); }
+.d-shot { border-radius: 14px; }
+.lightbox {
+  position: fixed; inset: 0; z-index: 50; background: var(--scrim);
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: center; justify-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 56px) 12px calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+.lb-fig { margin: 0; display: grid; gap: 10px; justify-items: center; max-height: 100%; min-height: 0; }
+.lb-fig img { max-width: 100%; max-height: calc(100vh - 150px); width: auto; height: auto; border-radius: 18px; border: 3px solid var(--gold); background: var(--bg); box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+.lb-fig figcaption { color: var(--on-scrim); font-family: var(--font-display); font-weight: 800; font-size: 20px; text-align: center; }
+.lb-btn { width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer; background: var(--card); color: var(--ink); font-size: 34px; line-height: 1; font-family: var(--font-display); font-weight: 800; display: grid; place-items: center; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+.lb-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.lb-close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 14px; font-size: 32px; }
+.lightbox.is-open .lb-fig { animation: lbin .25s ease-out; }
+@keyframes lbin { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+
+/* ---------- status and roadmap ---------- */
+.status { padding: 24px 28px 28px; display: grid; gap: 18px; }
+.status-cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; }
+.col { background: var(--bg); border-radius: 22px; padding: 16px 18px 18px; display: grid; gap: 10px; align-content: start; }
+.col h3 { margin: 0; display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 20px; color: var(--ink); }
+.col h3 .chip { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px 3px; border-radius: 999px; color: #fff; background: var(--ok); }
+.col.next h3 .chip { background: var(--muted); }
+.checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.checks li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; font-size: 15px; color: var(--ink); }
+.checks li b { font-weight: 800; }
+.checks .ic { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 800; color: #fff; background: var(--ok); margin-top: 1px; }
+.next .checks .ic { background: transparent; border: 2px dashed var(--muted); color: var(--muted); }
+.engine { margin: 0; display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; background: var(--hl); border-radius: 18px; padding: 12px 16px; font-size: 15px; color: var(--ink); }
+.engine img { width: 56px; height: 56px; object-fit: contain; }
+.engine b { font-weight: 800; }
+
+/* ---------- come-back tiles ---------- */
+.hooks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.hook { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 18px 18px 18px 16px; display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; }
+.hook img { width: 64px; height: 64px; object-fit: contain; }
+.hook h4 { font-family: var(--font-display); font-weight: 800; font-size: 19px; margin: 0; line-height: 1.15; color: var(--ink); }
+.hook p { margin: 2px 0 0; font-size: 14.5px; color: var(--muted); }
+.hooks-title { font-family: var(--font-display); font-weight: 800; font-size: 22px; margin: 0 0 -6px; text-align: center; color: var(--ink); }
+.fine { margin: 0; text-align: center; font-size: 13px; color: var(--muted); text-wrap: balance; }
+
+/* ---------- narrow screens ---------- */
+@media screen and (max-width: 820px) {
+  .loop-body { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .stage { max-width: 420px; }
+  .adv-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 18px; }
+  .adv-steps li:nth-child(3)::before { display: none; }
+  .bet-body, .kingdom-body, .status-cols { grid-template-columns: minmax(0, 1fr); }
+  .peers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .peers li.us { grid-column: 1 / -1; }
+  .areas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 640px) {
+  .hero { flex-direction: column; align-items: stretch; min-height: 0; overflow: visible; background: none; box-shadow: none; aspect-ratio: auto; }
+  .hero-art { position: relative; height: auto; aspect-ratio: 16 / 9; border-radius: 22px; }
+  .glass { width: auto; margin: -34px 12px 0; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+  .glass-body { padding: 14px 14px 16px; gap: 6px; }
+  .icon-cell { padding: 16px 0 14px 14px; place-items: start center; }
+  h1 img { max-width: 200px; }
+  .tagline { font-size: 17px; }
+  .lede { font-size: 14px; }
+  .pill { font-size: 13px; }
+  .loop { padding: 20px 14px 24px; }
+  .legend li { padding: 8px 10px; column-gap: 12px; grid-template-columns: 34px 1fr; }
+  .legend .badge { width: 34px; height: 34px; font-size: 17px; }
+  .legend h3 { font-size: 20px; }
+  .legend p { font-size: 15px; }
+  .hooks { grid-template-columns: 1fr; }
+  .adv, .shots, .bet, .kingdom, .swap, .status { padding: 20px 14px 24px; }
+  .lanes { grid-template-columns: minmax(0, 1fr); }
+  .verbs img { width: 52px; height: 52px; }
+  .verbs li { grid-template-columns: 52px 1fr; }
+  .adv-steps li + li::before { display: none; }
+  .adv-art { width: 92px; height: 92px; }
+  .detail { grid-template-columns: 92px minmax(0, 1fr); gap: 14px; padding: 12px; }
+  .detail h3 { font-size: 22px; }
+  .detail p, .detail li { font-size: 15px; }
+  .shot-grid { gap: 8px; }
+  .map .peer-label { font-size: 16px; }
+  .map .axis-label { font-size: 14px; }
+  .map .us-label { font-size: 20px; }
+  .map .goal-label { font-size: 14px; }
+  .hyp-text { font-size: 23px; }
+  .how li { font-size: 15px; }
+  .peers h4 { font-size: 16px; }
+  .peers p { font-size: 13.5px; }
+  .decos img { width: 52px; height: 52px; }
+  .track { height: 150px; }
+  .goal-card { left: 50%; transform: translateX(-50%); top: 8px; }
+  .track .item, .track .dest { top: 68%; }
+  .lane.ours .dest img { width: 56px; }
+  .lightbox { grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr) auto; row-gap: 14px; padding-inline: 10px; }
+  .lb-fig { grid-column: 1 / -1; grid-row: 1; }
+  .lb-fig img { max-height: calc(100vh - 210px); }
+  .lb-prev { grid-column: 1; grid-row: 2; justify-self: end; margin-right: 10px; }
+  .lb-next { grid-column: 2; grid-row: 2; justify-self: start; margin-left: 10px; }
+  .shot-grid figcaption { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+  .merge .a, .merge .b { opacity: 0; }
+  .merge .out { opacity: 1; }
+  .ring .token, .bubble, .bub, .reward { display: none; }
+  .gone, .goal-card .done { opacity: 1; }
+  .goal-card .bar b { width: 100%; }
+}
+
+@media print {
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+    --bg: #eaf6f9; --sky-2: #ffffff; --card: #ffffff; --ink: #0d3149; --muted: #47667a;
+    --royal: #0b7ea3; --fill: #0f86ad; --gold: #d0661f; --ring: #bfe0ea; --glow: transparent; --hl: rgba(232,121,47,.14);
+    --shadow: none; color-scheme: light;
+  }
+  @page { size: A4; margin: 12mm; }
+  html, body { background: #ffffff !important; }
+  body { padding: 0; font-size: 12.5px; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .poster { display: block; max-width: none; }
+  .poster > * { margin: 0 0 12px; }
+  .hero, .card, .loop, .hook { box-shadow: none !important; border: 1px solid #dbe9ee; }
+  .hero, .bet, .swap, .loop, .adv, .shots, .status, .hook, .peers li, .areas li, .print-details .pd, figure, .lane, .col { break-inside: avoid; page-break-inside: avoid; }
+  .hint, .detail, .ring .token, .reward, .merge .a, .merge .b, .map .pulse, .bubble, .bub, .shafts, .lightbox, .map-note { display: none !important; }
+  .merge .out { opacity: 1 !important; transform: none !important; }
+  .gone, .goal-card .done { opacity: 1 !important; }
+  .goal-card .bar b { width: 100% !important; }
+  .lane.theirs .item { left: 6% !important; }
+  .lane.ours .item { left: 6% !important; }
+  .legend li { box-shadow: none !important; background: transparent !important; }
+  .node.is-selected .art { border-color: var(--ring); }
+  .print-details { display: grid; gap: 8px; margin-top: 6px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .print-details h3 { grid-column: 1 / -1; margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--ink); }
+  .print-details .pd { border: 1px solid #dbe9ee; border-radius: 12px; padding: 8px 12px; }
+  .print-details .pd strong { font-family: var(--font-display); font-size: 15px; color: var(--royal); }
+  .print-details .pd p { margin: 2px 0 4px; }
+  .print-details .pd p, .print-details .pd li { font-size: 12px; }
+  .print-details .pd ul { margin: 0; padding-left: 18px; }
+  .shot-grid img { box-shadow: none; }
+  /* A4 portrait: page 1 header, the bet, goals; page 2 the loop; page 3 aquarium + creatures; page 4 screens, status, hooks */
+  .hero { aspect-ratio: 16 / 9; }
+  .hero-art { display: none !important; }
+  .hero-print { display: block; }
+  .glass { background: rgba(255, 255, 255, .88); -webkit-backdrop-filter: none; backdrop-filter: none; width: min(100% - 32px, 500px); margin: 16px; }
+  h1 img { max-width: 220px; }
+  .bet, .swap, .loop, .adv, .shots, .status, .kingdom { padding: 14px 18px 16px; gap: 10px; }
+  .sec-head h2, .loop-title { font-size: 20px; }
+  .bet-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+  .hyp-text { font-size: 20px; }
+  .how li { font-size: 12.5px; }
+  .pass { font-size: 12.5px; }
+  .peers { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  .peers li { padding: 8px 9px 10px; }
+  .peers h4 { font-size: 14px; }
+  .peers p { font-size: 11px; }
+  .peers .type { font-size: 9.5px; }
+  .loop { break-before: page; }
+  .lanes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .track { height: 104px; }
+  .lane li { font-size: 12.5px; }
+  .loop-body { grid-template-columns: 250px minmax(0, 1fr); gap: 18px; }
+  .stage { max-width: 250px; }
+  .print-details { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 6px !important; }
+  .print-details .pd { padding: 6px 9px !important; }
+  .print-details .pd p, .print-details .pd li { font-size: 10.5px !important; }
+  .legend li { padding: 6px 10px; grid-template-columns: 30px 1fr; column-gap: 10px; }
+  .legend .badge { width: 30px; height: 30px; font-size: 15px; }
+  .legend h3 { font-size: 17px; }
+  .legend p { font-size: 12.5px; }
+  .repeat { font-size: 14px; }
+  .kingdom { break-before: page; }
+  .kingdom-body { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; }
+  .verbs li { padding: 6px 10px; grid-template-columns: 40px 1fr; }
+  .verbs img { width: 40px; height: 40px; }
+  .verbs h3 { font-size: 15px; }
+  .verbs p, .tank figcaption { font-size: 12px; }
+  .areas { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .areas h4 { font-size: 14px; }
+  .areas p { font-size: 11px; }
+  .decos { display: none; }
+  .kingdom { gap: 8px; }
+  .adv-steps { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .adv-steps li { padding: 4px 6px 6px; }
+  .tank-view { max-height: 230px; aspect-ratio: auto; height: 230px; }
+  .kingdom .sec-head p, .adv .sec-head p { font-size: 11.5px; }
+  .footnote { font-size: 11px; }
+  .areas-head { font-size: 15px; }
+  .adv-steps li + li::before { top: 46px; }
+  .adv-art { width: 80px; height: 80px; }
+  .adv-steps h3 { font-size: 16px; }
+  .adv-steps p { font-size: 12px; }
+  .shots { break-before: page; }
+  .shot-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; max-width: none; }
+  .sec-head p { font-size: 12px; }
+  .shots .sec-head p { display: none !important; }
+  .shot-grid figcaption { font-size: 11px; }
+  .status-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .col { padding: 10px 12px 12px; gap: 6px; }
+  .col h3 { font-size: 16px; }
+  .checks li { font-size: 12px; }
+  .engine { font-size: 12px; padding: 8px 12px; grid-template-columns: 40px 1fr; }
+  .engine img { width: 40px; height: 40px; }
+  .hooks-title { font-size: 18px; margin: 0; }
+  .hooks { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .hook { padding: 12px; grid-template-columns: 44px 1fr; gap: 10px; }
+  .hook img { width: 44px; height: 44px; }
+  .hook h4 { font-size: 15px; }
+  .hook p { font-size: 12px; }
+}
+</style>
+
+<main class="poster">
+  <header class="hero">
+    <video class="hero-art" autoplay muted loop playsinline preload="auto" poster="img/promo-poster.jpg" aria-label="The mermaid heroine swims through a sunken kingdom with her sea friends">
+      <source src="merge-atlantis-promo.mp4" type="video/mp4">
+    </video>
+    <img class="hero-print" src="img/promo-poster.jpg" alt="">
+    <div class="glass">
+      <div class="icon-cell"><img class="app-icon" src="img/appicon.webp" alt="Merge Atlantis app icon: the mermaid heroine"></div>
+      <div class="glass-body">
+        <h1><img src="img/logo.webp" alt="Merge Atlantis" width="900" height="401"></h1>
+        <p class="tagline">Merge. Build. Decorate an underwater kingdom.</p>
+        <p class="lede">A cosy merge game where nothing you make is taken away: everything ends up in a sunken kingdom you decorate and come back to.</p>
+        <div class="status-row"><span class="pill"><i></i>Playable prototype</span></div>
+        <p class="soon">In development · Not in stores yet</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="bet card" aria-labelledby="bet-title">
+    <div class="sec-head">
+      <p class="kicker">What we are testing</p>
+      <h2 id="bet-title">The bet behind Merge Atlantis</h2>
+    </div>
+    <div class="bet-body">
+      <div class="hyp">
+        <p class="hyp-label">Hypothesis</p>
+        <p class="hyp-text">Players stay longer when nothing they make is taken away, and every merge ends up in a home they decorate.</p>
+        <ul class="how">
+          <li><span class="tick">1</span><span><b>Goals, not orders.</b> Goals count what you do. They never take an item away.</span></li>
+          <li><span class="tick">2</span><span><b>What you build stays.</b> Finished decorations go to your aquarium, and placing them opens the next area.</span></li>
+          <li><span class="tick">3</span><span><b>Creatures do the work.</b> Call a jellyfish or an octopus to harvest and build, and collect pets.</span></li>
+        </ul>
+        <p class="pass"><b>It works if</b> players keep decorating and coming back for longer than in today's order-based merge games.</p>
+      </div>
+      <figure class="map" aria-label="Positioning map: order-based merge games sit low on keeping what you make; aquarium-decoration games have a rich decoration meta but no merge; Merge Atlantis aims for merge where everything you make stays and decorates a home.">
+        <svg viewBox="0 0 420 330" role="img">
+          <title>Where Merge Atlantis sits</title>
+          <rect class="quad" x="40" y="10" width="370" height="280" rx="14"></rect>
+          <rect class="goal" x="222" y="16" width="182" height="118" rx="12"></rect>
+          <text class="goal-label" x="232" y="34">THE OPEN SPOT</text>
+          <line class="axis" x1="40" y1="290" x2="410" y2="290"></line>
+          <line class="axis" x1="40" y1="290" x2="40" y2="10"></line>
+          <text class="axis-label" x="44" y="310">Little to decorate</text>
+          <text class="axis-label" x="406" y="310" text-anchor="end">A home you decorate</text>
+          <text class="axis-label" transform="translate(26 286) rotate(-90)">Sent away</text>
+          <text class="axis-label" transform="translate(26 14) rotate(-90)" text-anchor="end">What you make stays</text>
+
+          <path class="move" d="M150,232 C210,200 262,146 296,112"></path>
+          <path class="move-head" d="M289,108 L306,100 L300,117 z"></path>
+          <path class="move" d="M352,214 C364,172 372,136 372,104"></path>
+          <path class="move-head" d="M364,106 L372,90 L380,106 z"></path>
+
+          <circle class="peer" cx="118" cy="246" r="9"></circle>
+          <text class="peer-label" x="106" y="272">Order-based merge</text>
+          <circle class="peer" cx="104" cy="72" r="9"></circle>
+          <text class="peer-label" x="104" y="54" text-anchor="middle">Big-map merge</text>
+          <circle class="peer" cx="352" cy="228" r="9"></circle>
+          <text class="peer-label" x="404" y="256" text-anchor="end">Aquarium decorating</text>
+          <circle class="peer" cx="214" cy="158" r="9"></circle>
+          <text class="peer-label" x="228" y="163">Merge Crown</text>
+
+          <circle class="pulse" cx="372" cy="62" r="20"></circle>
+          <image href="img/orb.webp" x="352" y="42" width="40" height="40"></image>
+          <text class="us-label" x="344" y="68" text-anchor="end">Merge Atlantis</text>
+        </svg>
+      </figure>
+    </div>
+    <ul class="peers">
+      <li><p class="type">One-screen merge</p><h4>Order-based merge</h4><p>Easy merge with a story. What you make is handed over in orders and is gone.</p></li>
+      <li><p class="type">Big-map merge</p><h4>Big-map merge</h4><p>What you merge stays on the map, but the map is the game: wide to pan and search.</p></li>
+      <li><p class="type">Decoration meta</p><h4>Aquarium decorating</h4><p>A loved meta: decorate a tank, fill it, open the next. Fed by a puzzle that is not merge.</p></li>
+      <li><p class="type">Our first bet</p><h4>Merge Crown</h4><p>Orders pay for a kingdom that stays, with creatures from island adventures.</p></li>
+      <li class="us"><p class="type">This bet</p><h4>Merge Atlantis</h4><p>One merge board, goals instead of orders, and everything you make decorates an underwater kingdom.</p></li>
+    </ul>
+    <p class="map-note">Categories describe the genre in general, not any single title. Placement is our qualitative view.</p>
+  </section>
+
+  <section class="swap card" aria-labelledby="swap-title">
+    <div class="sec-head">
+      <p class="kicker">The one big change</p>
+      <h2 id="swap-title">Goals instead of orders</h2>
+      <p>In most merge games the best thing you make leaves the board for good. Here it never does.</p>
+    </div>
+    <div class="lanes">
+      <div class="lane theirs">
+        <p class="lane-type">Today's merge games</p>
+        <h3>An order takes it away</h3>
+        <div class="track" aria-hidden="true">
+          <img class="item" src="img/chain_pearl_treasures_04.webp" alt="">
+          <div class="dest"><div class="order-card"><img src="img/chain_pearl_treasures_04.webp" alt="">Order</div><span class="gone">Gone</span></div>
+        </div>
+        <ul>
+          <li>You merge up to the piece the order asks for.</li>
+          <li>The order takes it, pays, and the piece is gone.</li>
+        </ul>
+      </div>
+      <div class="lane ours">
+        <p class="lane-type">Merge Atlantis</p>
+        <h3>A goal counts it, and it stays</h3>
+        <div class="track" aria-hidden="true">
+          <div class="goal-card"><img src="img/chain_pearl_treasures_04.webp" alt=""><span>Make a Pearl Cup<span class="bar"><b></b></span><span class="done">Done!</span></span></div>
+          <img class="item" src="img/chain_pearl_treasures_04.webp" alt="">
+          <div class="dest"><img src="img/deco_coral_pearl_lantern.webp" alt=""><span class="dest-label">Your aquarium</span></div>
+        </div>
+        <ul>
+          <li>Goals come a few at a time and complete on their own from what you do.</li>
+          <li>They pay coins and energy. The piece stays on the board, and what it builds goes to your aquarium.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="loop" aria-labelledby="loop-title">
+    <h2 class="loop-title" id="loop-title">The core loop</h2>
+    <p class="hint">Tap any step to see more.</p>
+    <div class="loop-body">
+      <div class="stage">
+        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <marker id="tip" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+              <path class="head-mark" d="M0,0 L10,5 L0,10 z"></path>
+            </marker>
+          </defs>
+          <circle class="track-c" cx="50" cy="50" r="36"></circle>
+          <g id="arcs"></g>
+          <g class="token">
+            <image href="img/orb.webp" x="-3.4" y="-3.4" width="6.8" height="6.8"></image>
+            <animateMotion dur="12s" repeatCount="indefinite" rotate="0" path="M50,14 A36,36 0 1,1 49.99,14"></animateMotion>
+          </g>
+        </svg>
+
+        <div class="node" style="--i:0; --x:50%; --y:14%">
+          <div class="art"><span class="num">1</span><img src="img/chain_ribbon_kelp_06.webp" alt="A mature kelp bed">
+            <img class="reward c" src="img/chain_pearl_treasures_01.webp" alt="">
+          </div>
+          <span class="tag">Harvest</span>
+        </div>
+        <div class="node" style="--i:1; --x:84.2%; --y:38.9%">
+          <div class="art"><span class="num">2</span>
+            <div class="merge" aria-hidden="true">
+              <img class="a" src="img/chain_pearl_treasures_03.webp" alt="">
+              <img class="b" src="img/chain_pearl_treasures_03.webp" alt="">
+              <img class="out" src="img/chain_pearl_treasures_04.webp" alt="">
+            </div>
+          </div>
+          <span class="tag">Merge</span>
+        </div>
+        <div class="node" style="--i:2; --x:71.2%; --y:79.1%">
+          <div class="art"><span class="num">3</span><img src="img/coral_arch.webp" alt="A coral arch decoration"></div>
+          <span class="tag">Build</span>
+        </div>
+        <div class="node" style="--i:3; --x:28.8%; --y:79.1%">
+          <div class="art"><span class="num">4</span><img src="img/chain_shell_cottages_06.webp" alt="A new piece: a shell manor"></div>
+          <span class="tag">Discover</span>
+        </div>
+        <div class="node" style="--i:4; --x:15.8%; --y:38.9%">
+          <div class="art"><span class="num">5</span><img src="img/deco_pearl_wish_well.webp" alt="A pearl wishing well decoration"></div>
+          <span class="tag">Decorate</span>
+        </div>
+
+        <div class="center"><img src="img/mermaid.webp" alt="The mermaid heroine"></div>
+      </div>
+
+      <ol class="legend">
+        <li style="--i:0"><span class="badge">1</span><h3>Harvest</h3><p>A creature gathers fresh pieces from kelp beds and rocks.</p></li>
+        <li style="--i:1"><span class="badge">2</span><h3>Merge</h3><p>Match two of the same piece to make a better one.</p></li>
+        <li style="--i:2"><span class="badge">3</span><h3>Build</h3><p>The top of a chain becomes a decoration site. A creature builds it.</p></li>
+        <li style="--i:3"><span class="badge">4</span><h3>Discover</h3><p>Every new piece fills the Discovery Book and moves goals on.</p></li>
+        <li style="--i:4"><span class="badge">5</span><h3>Decorate</h3><p>Place it anywhere in your aquarium. It fills the area's meter.</p></li>
+      </ol>
+    </div>
+    <p class="repeat"><span aria-hidden="true">↻</span> A full meter opens the next area, with new things to make, so the loop starts again.</p>
+    <div class="detail" id="detail" aria-live="polite">
+      <button class="shot d-shot" id="d-shot" type="button" aria-label="Enlarge this screen"><img id="d-img" src="img/ss_working.webp" alt="Creatures at work on the reef"></button>
+      <div>
+        <p class="d-kicker" id="d-kicker">Step 1</p>
+        <h3 id="d-title">Harvest</h3>
+        <p id="d-body"></p>
+        <ul id="d-list"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="kingdom card" aria-labelledby="kingdom-title">
+    <div class="sec-head">
+      <p class="kicker">Your aquarium</p>
+      <h2 id="kingdom-title">Place it. Fill it. Open the next one.</h2>
+      <p>An underwater kingdom you decorate piece by piece, and keep coming back to.</p>
+    </div>
+    <div class="kingdom-body">
+      <figure class="tank">
+        <div class="tank-view">
+          <div class="scene" aria-hidden="true">
+            <img class="plate" src="img/area_sunlit_shallows.webp" alt="">
+            <div class="shafts"></div>
+            <img class="piece" src="img/deco_nautilus_gatehouse.webp" alt="" style="left:30%; top:63%; width:13%">
+            <img class="piece" src="img/deco_pearl_ribbon_plant.webp" alt="" style="left:44%; top:61%; width:8%">
+            <img class="piece" src="img/deco_mermaid_harp_statue.webp" alt="" style="left:66%; top:64%; width:11%">
+            <img class="piece" src="img/deco_reef_ribbon_arch.webp" alt="" style="left:48%; top:82%; width:16%">
+            <img class="piece" src="img/deco_spiral_shell_cottage.webp" alt="" style="left:20%; top:90%; width:18%">
+            <img class="piece" src="img/deco_feather_kelp.webp" alt="" style="left:82%; top:80%; width:11%">
+            <img class="piece" src="img/deco_clam_lily.webp" alt="" style="left:70%; top:97%; width:15%">
+            <img class="swim" src="img/jellyfish.webp" alt="" style="left:36%; top:30%; width:8%">
+            <img class="swim j" src="img/octopus.webp" alt="" style="left:72%; top:36%; width:10%">
+            <img class="swim" src="img/shark.webp" alt="" style="left:54%; top:24%; width:11%; animation-duration:7s">
+            <i class="bubble" style="left:40%; animation-delay:-2s"></i>
+            <i class="bubble" style="left:63%; animation-delay:-4.8s; width:.8%"></i>
+            <i class="bubble" style="left:88%; animation-delay:-1.2s"></i>
+          </div>
+        </div>
+        <figcaption><b>The aquarium feeling.</b> Creatures swim among your decorations, and the heroine greets every piece you place. Composed here from the game's own art.</figcaption>
+      </figure>
+      <ul class="verbs">
+        <li><img src="img/deco_spiral_shell_cottage.webp" alt=""><div><h3>Place anywhere</h3><p>Free placement on the sand. Pieces further back draw smaller, like a real scene.</p></div></li>
+        <li><img src="img/chain_pearl_treasures_04.webp" alt=""><div><h3>Fill the meter</h3><p>Every decoration adds deco points. A full meter completes the area.</p></div></li>
+        <li><img src="img/deco_nautilus_gatehouse.webp" alt=""><div><h3>Open the next area</h3><p>A finished area opens the next one and hands out its welcome gift.</p></div></li>
+        <li><img src="img/deco_reef_ribbon_arch.webp" alt=""><div><h3>Revisit and redecorate</h3><p>Every area stays open. Move, mirror or put back anything, any time.</p></div></li>
+      </ul>
+    </div>
+    <h3 class="areas-head">Four areas, one wonder each</h3>
+    <ol class="areas">
+      <li><div class="area-art"><img class="plate" src="img/area_sunlit_shallows.webp" alt="" loading="lazy"><img class="wonder" src="img/chain_conch_conservatory_04.webp" alt="" loading="lazy"><span class="area-num">1</span></div>
+        <h4>Sunlit Shallows</h4><p>Kelp, pearls, shell cottages and tide fountains. Wonder: <span class="wname">Great Conch Conservatory</span></p></li>
+      <li><div class="area-art"><img class="plate" src="img/area_coral_gardens.webp" alt="" loading="lazy"><img class="wonder" src="img/wonder_coral_cathedral.webp" alt="" loading="lazy"><span class="area-num">2</span></div>
+        <h4>Coral Gardens</h4><p>Fan coral, sea blossoms, reef nurseries and seahorse havens. Wonder: <span class="wname">Living Coral Cathedral</span></p></li>
+      <li><div class="area-art"><img class="plate" src="img/area_royal_atlantis.webp" alt="" loading="lazy"><img class="wonder" src="img/wonder_heart_of_atlantis.webp" alt="" loading="lazy"><span class="area-num">3</span></div>
+        <h4>Royal Atlantis</h4><p>Crystal gardens, relics, mosaic villas and tide engines. Wonder: <span class="wname">Heart of Atlantis</span></p></li>
+      <li><div class="area-art"><img class="plate" src="img/area_shipwreck_cove.webp" alt="" loading="lazy"><img class="wonder" src="img/wonder_galleon.webp" alt="" loading="lazy"><span class="area-num">4</span></div>
+        <h4>Shipwreck Cove</h4><p>Wreck salvage, treasure, mariners' relics and hideaways. Wonder: <span class="wname">Crown's Rest Galleon</span></p></li>
+    </ol>
+    <ul class="decos" aria-label="Some of the decorations">
+      <li><img src="img/deco_bubble_grotto.webp" alt="Bubble grotto" loading="lazy"></li>
+      <li><img src="img/deco_sea_keeper_throne.webp" alt="Sea keeper throne" loading="lazy"></li>
+      <li><img src="img/deco_conch_throne.webp" alt="Conch throne" loading="lazy"></li>
+      <li><img src="img/deco_seahorse_monument.webp" alt="Seahorse monument" loading="lazy"></li>
+      <li><img src="img/deco_octopus_porthole.webp" alt="Octopus porthole" loading="lazy"></li>
+      <li><img src="img/deco_wreck_pearl_chest.webp" alt="Wreck pearl chest" loading="lazy"></li>
+      <li><img src="img/deco_captain_pearl_lantern.webp" alt="Captain's pearl lantern" loading="lazy"></li>
+      <li><img src="img/deco_sea_glass_wheel.webp" alt="Sea glass wheel" loading="lazy"></li>
+      <li><img src="img/deco_salvage_quay.webp" alt="Salvage quay" loading="lazy"></li>
+      <li><img src="img/deco_crown_anemone.webp" alt="Crown anemone" loading="lazy"></li>
+    </ul>
+    <p class="footnote">Designed so far: 16 merge chains of seven tiers, four wonders built in stages, and 189 decorations in seven collections.</p>
+  </section>
+
+  <section class="adv card" aria-labelledby="adv-title">
+    <div class="sec-head">
+      <p class="kicker">The creature layer</p>
+      <h2 id="adv-title">Sea creatures and pets</h2>
+      <p>Creatures do the work on the reef, in 3D with a soft jelly look. The ones you earn come home to your aquarium.</p>
+    </div>
+    <ol class="adv-steps">
+      <li style="--j:0">
+        <div class="adv-art"><img class="bob" src="img/octopus.webp" alt="The octopus"></div>
+        <h3>Call</h3><p>Drag a creature onto a job, or let the nearest one take it.</p>
+      </li>
+      <li style="--j:1">
+        <div class="adv-art"><img class="bob" src="img/jellyfish.webp" alt="The jellyfish"><i class="bub b1"></i><i class="bub b2"></i><i class="bub b3"></i></div>
+        <h3>Work</h3><p>The jellyfish works in glowing bubbles, the octopus with its arms.</p>
+      </li>
+      <li style="--j:2">
+        <div class="adv-art"><img src="img/well.webp" alt="The magical well"><img class="orb" src="img/orb.webp" alt=""></div>
+        <h3>Heal the reef</h3><p>Burst water orbs from the well to bring dead reef back to life.</p>
+      </li>
+      <li style="--j:3">
+        <div class="adv-art"><img class="bob" src="img/shark.webp" alt="The shark pet"><i class="spark s1"></i><i class="spark s2"></i><i class="spark s3"></i></div>
+        <h3>Earn pets</h3><p>Finish an area to earn a pet. The shark is the first.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="shots card" aria-labelledby="shots-title">
+    <div class="sec-head"><h2 id="shots-title">From the prototype</h2><p>Captured in the Unity build. Tap a screen to see it large.</p></div>
+    <div class="shot-grid">
+      <figure><button class="shot" type="button" aria-label="Enlarge: Your aquarium"><img id="g-aquarium" src="img/ss_aquarium.webp" alt="The first area, decorated, with its meter full" loading="lazy"></button><figcaption>Your aquarium</figcaption></figure>
+      <figure><button class="shot" type="button" aria-label="Enlarge: The reef board"><img id="g-reef" src="img/ss_reef.webp" alt="The 7 by 9 reef board with the jellyfish and the octopus" loading="lazy"></button><figcaption>The reef board</figcaption></figure>
+      <figure><button class="shot" type="button" aria-label="Enlarge: Creatures at work"><img id="g-working" src="img/ss_working.webp" alt="The octopus and the jellyfish working beside harvest rocks, with timers" loading="lazy"></button><figcaption>Creatures at work</figcaption></figure>
+      <figure><button class="shot" type="button" aria-label="Enlarge: Building a decoration"><img id="g-building" src="img/ss_building.webp" alt="The octopus building a decoration on the reef" loading="lazy"></button><figcaption>Building a decoration</figcaption></figure>
+      <figure><button class="shot" type="button" aria-label="Enlarge: New discovery"><img id="g-discovery" src="img/ss_discovery.webp" alt="A new discovery card for a water orb" loading="lazy"></button><figcaption>New discovery</figcaption></figure>
+      <figure><button class="shot" type="button" aria-label="Enlarge: Decorations"><img id="g-decorations" src="img/ss_decorations.webp" alt="The decorations panel with collections" loading="lazy"></button><figcaption>Decorations</figcaption></figure>
+      <figure><button class="shot" type="button" aria-label="Enlarge: Area complete"><img id="g-complete" src="img/ss_complete.webp" alt="The area complete card, with the shark as a reward" loading="lazy"></button><figcaption>Area complete</figcaption></figure>
+      <figure><button class="shot" type="button" aria-label="Enlarge: Your first pet"><img id="g-shark" src="img/ss_shark.webp" alt="The shark pet swimming in the aquarium" loading="lazy"></button><figcaption>Your first pet</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="status card" aria-labelledby="status-title">
+    <div class="sec-head">
+      <p class="kicker">Where we are</p>
+      <h2 id="status-title">A playable prototype in Unity</h2>
+      <p>Built in days on the engine behind Merge Crown, so merging, crews, timers and saves worked from the start.</p>
+    </div>
+    <div class="status-cols">
+      <div class="col">
+        <h3>Playable today <span class="chip">Built</span></h3>
+        <ul class="checks">
+          <li><span class="ic">✓</span><span><b>The reef board:</b> harvest, merge and build on one 7 × 9 board, with no orders and no fog.</span></li>
+          <li><span class="ic">✓</span><span><b>Goals</b> that come a few at a time and complete on their own.</span></li>
+          <li><span class="ic">✓</span><span><b>The jellyfish and octopus crew</b> in 3D, working jobs on timers.</span></li>
+          <li><span class="ic">✓</span><span><b>The aquarium:</b> free placement, the deco meter, area complete, and areas to revisit.</span></li>
+          <li><span class="ic">✓</span><span><b>The first pet,</b> the shark, earned by finishing the first area.</span></li>
+          <li><span class="ic">✓</span><span><b>Dead reef</b> healed with water orbs from a magical well.</span></li>
+          <li><span class="ic">✓</span><span><b>A near-instant switch</b> between the board and the aquarium, and the Discovery Book.</span></li>
+          <li><span class="ic">✓</span><span><b>The look:</b> painted UI kit, logo, heroine and an under-water feel with bubbles and ripples.</span></li>
+        </ul>
+      </div>
+      <div class="col next">
+        <h3>Next <span class="chip">Planned</span></h3>
+        <ul class="checks">
+          <li><span class="ic">→</span><span><b>All four areas in the game.</b> Art is done for 16 chains and four wonders.</span></li>
+          <li><span class="ic">→</span><span><b>Wonders</b> that grow in stages from your discoveries.</span></li>
+          <li><span class="ic">→</span><span><b>More creatures and pets</b> to call and collect.</span></li>
+          <li><span class="ic">→</span><span><b>Economy and balancing:</b> energy, harvest pace and rewards.</span></li>
+          <li><span class="ic">→</span><span><b>Monetization design</b> and live events.</span></li>
+          <li><span class="ic">→</span><span><b>Store builds and a soft-launch test</b> of the retention bet.</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="engine"><img src="img/stone_block.webp" alt=""><span><b>Shared tech, a new bet.</b> Merge Atlantis reuses the systems we built for Merge Crown. Each new bet starts from a working game, so we can test ideas in days, not months.</span></p>
+  </section>
+
+  <h2 class="hooks-title">Why players come back</h2>
+  <section class="hooks">
+    <article class="hook">
+      <img src="img/icon_energy.webp" alt="">
+      <div><h4>Energy refills</h4><p>Merging uses energy. It refills over time, so players return when it is full.</p></div>
+    </article>
+    <article class="hook">
+      <img src="img/deco_coral_pearl_lantern.webp" alt="">
+      <div><h4>One more decoration</h4><p>Every piece moves the meter toward the next area. One more decoration is a reason to come back.</p></div>
+    </article>
+    <article class="hook">
+      <img src="img/icon_timer.webp" alt="">
+      <div><h4>Creatures keep working</h4><p>Harvests and builds run on timers, so there is always something ready.</p></div>
+    </article>
+  </section>
+  <p class="fine">Investor preview · Merge Atlantis by Nimble Games · Prototype screens and art in development, October 2026.</p>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Screen from the game" hidden>
+    <button class="lb-btn lb-close" type="button" aria-label="Close">&times;</button>
+    <button class="lb-btn lb-prev" type="button" aria-label="Previous screen">&lsaquo;</button>
+    <figure class="lb-fig"><img id="lb-img" src="" alt=""><figcaption id="lb-cap"></figcaption></figure>
+    <button class="lb-btn lb-next" type="button" aria-label="Next screen">&rsaquo;</button>
+  </div>
+</main>
+
+<script>
+// Gold arrows on the ring between each pair of steps, clear of the step art.
+(function () {
+  var g = document.getElementById('arcs');
+  if (!g) return;
+  var r = 36, cx = 50, cy = 50, gap = 19;
+  for (var i = 0; i < 5; i++) {
+    var a0 = (-90 + 72 * i + gap) * Math.PI / 180;
+    var a1 = (-90 + 72 * (i + 1) - gap) * Math.PI / 180;
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', 'M' + (cx + r * Math.cos(a0)).toFixed(2) + ',' + (cy + r * Math.sin(a0)).toFixed(2) + ' A' + r + ',' + r + ' 0 0,1 ' + (cx + r * Math.cos(a1)).toFixed(2) + ',' + (cy + r * Math.sin(a1)).toFixed(2));
+    p.setAttribute('class', 'arc');
+    p.setAttribute('marker-end', 'url(#tip)');
+    g.appendChild(p);
+  }
+})();
+</script>
+
+<script>
+// Tap a step (ring bubble or legend row) to show more about it in the panel below.
+(function () {
+  var steps = [
+    { img: "#g-working", alt: "Creatures at work on the reef", title: "Harvest",
+      body: "Harvest beds and rocks sit on the reef. Tap one and a jellyfish or an octopus swims over, works beside it on a short timer, and lands a batch of fresh pieces on the board.",
+      list: ["Kelp, coral, a clam bed and pebbles are the starting sources.", "Drag a creature onto a job, or let the nearest one take it.", "The board runs on energy, which refills over time."] },
+    { img: "#g-reef", alt: "The reef board", title: "Merge",
+      body: "The reef is one fixed 7 × 9 board. Two equal pieces merge into the next tier up their chain.",
+      list: ["No fog to clear and no second board to travel to.", "The board feels under water: pieces trail bubbles when dragged and sway at rest.", "Dead reef cells heal with water orbs from a magical well."] },
+    { img: "#g-building", alt: "Building a decoration", title: "Build",
+      body: "Two of a chain's top piece become a construction site. A creature builds it with time and stone blocks, and the finished decoration leaves for your aquarium.",
+      list: ["Nothing is handed over: the decoration is yours to keep.", "Finished decorations wait in storage until you place them.", "Builds run on timers, like harvests."] },
+    { img: "#g-discovery", alt: "A new discovery", title: "Discover",
+      body: "Every first piece is a discovery. It fills the Discovery Book and counts toward goals.",
+      list: ["Goals come a few at a time and complete on their own from what you do.", "A goal never takes anything away. It pays coins and energy.", "Planned: each area's wonder grows in stages from your discoveries."] },
+    { img: "#g-aquarium", alt: "Your aquarium", title: "Decorate",
+      body: "Place decorations anywhere on the sand of the current area. Pieces further back draw smaller, like a real scene.",
+      list: ["Each decoration's points fill the area's meter. A full meter opens the next area.", "Move, mirror or put back anything at any time. Nothing is lost.", "Finished areas stay open to revisit and redecorate."] }
+  ];
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.node'));
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.legend li'));
+  var panel = document.getElementById('detail');
+  var img = document.getElementById('d-img'), kicker = document.getElementById('d-kicker'),
+      title = document.getElementById('d-title'), body = document.getElementById('d-body'), list = document.getElementById('d-list');
+  if (!panel || nodes.length !== 5 || rows.length !== 5) return;
+  function select(i, fromUser) {
+    var s = steps[i];
+    var el = document.getElementById(s.img.slice(1));
+    if (el) img.src = el.getAttribute('src');
+    img.alt = s.alt;
+    kicker.textContent = 'Step ' + (i + 1);
+    title.textContent = s.title;
+    body.textContent = s.body;
+    list.innerHTML = '';
+    s.list.forEach(function (line) { var li = document.createElement('li'); li.textContent = line; list.appendChild(li); });
+    nodes.forEach(function (n, k) { n.classList.toggle('is-selected', k === i); n.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    rows.forEach(function (r, k) { r.classList.toggle('is-selected', k === i); r.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    if (fromUser) {
+      panel.classList.remove('swapin'); void panel.offsetWidth; panel.classList.add('swapin');
+      var r = panel.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > (window.innerHeight || 0)) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+  function wire(el, i, label) {
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-controls', 'detail');
+    el.setAttribute('aria-label', 'Step ' + (i + 1) + ': ' + label + '. Show more');
+    el.addEventListener('click', function () { select(i, true); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(i, true); } });
+  }
+  nodes.forEach(function (n, i) { wire(n, i, steps[i].title); });
+  rows.forEach(function (r, i) { wire(r, i, steps[i].title); });
+  var pd = document.createElement('div');
+  pd.className = 'print-details';
+  var h = document.createElement('h3'); h.textContent = 'The five steps in more detail'; pd.appendChild(h);
+  steps.forEach(function (s, i) {
+    var box = document.createElement('div'); box.className = 'pd';
+    var st = document.createElement('strong'); st.textContent = (i + 1) + '. ' + s.title; box.appendChild(st);
+    var p = document.createElement('p'); p.textContent = s.body; box.appendChild(p);
+    var ul = document.createElement('ul');
+    s.list.forEach(function (line) { var li = document.createElement('li'); li.textContent = line; ul.appendChild(li); });
+    box.appendChild(ul); pd.appendChild(box);
+  });
+  panel.parentNode.insertBefore(pd, panel.nextSibling);
+  select(0, false);
+})();
+</script>
+
+<script>
+// Tap a screen (gallery or the step panel) to see it large; arrows, swipe and Escape work.
+(function () {
+  var box = document.getElementById('lightbox');
+  var img = document.getElementById('lb-img'), cap = document.getElementById('lb-cap');
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('.shot-grid .shot'));
+  if (!box || !buttons.length) return;
+  var shots = buttons.map(function (b) {
+    var i = b.querySelector('img'), f = b.closest('figure');
+    return { src: i.getAttribute('src'), alt: i.alt, cap: f ? f.querySelector('figcaption').textContent : '' };
+  });
+  var at = 0, opener = null, x0 = null;
+  function show(i) {
+    at = (i + shots.length) % shots.length;
+    img.src = shots[at].src; img.alt = shots[at].alt; cap.textContent = shots[at].cap;
+    box.classList.remove('is-open'); void box.offsetWidth; box.classList.add('is-open');
+  }
+  function open(i, from) {
+    opener = from || document.activeElement;
+    show(i);
+    box.hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+    box.querySelector('.lb-close').focus();
+  }
+  function close() {
+    box.hidden = true;
+    box.classList.remove('is-open');
+    document.documentElement.style.overflow = '';
+    if (opener && opener.focus) opener.focus();
+  }
+  buttons.forEach(function (b, i) { b.addEventListener('click', function () { open(i, b); }); });
+  var panelShot = document.getElementById('d-shot'), panelImg = document.getElementById('d-img');
+  if (panelShot && panelImg) {
+    panelShot.addEventListener('click', function () {
+      var k = -1, src = panelImg.getAttribute('src');
+      for (var j = 0; j < shots.length; j++) { if (shots[j].src === src) { k = j; break; } }
+      open(k < 0 ? 0 : k, panelShot);
+    });
+  }
+  box.querySelector('.lb-close').addEventListener('click', close);
+  box.querySelector('.lb-prev').addEventListener('click', function (e) { e.stopPropagation(); show(at - 1); });
+  box.querySelector('.lb-next').addEventListener('click', function (e) { e.stopPropagation(); show(at + 1); });
+  box.addEventListener('click', function (e) { if (e.target === box || e.target.classList.contains('lb-fig')) close(); });
+  document.addEventListener('keydown', function (e) {
+    if (box.hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); show(at - 1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); show(at + 1); }
+    else if (e.key === 'Tab') {
+      var f = Array.prototype.slice.call(box.querySelectorAll('button'));
+      var k = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(k + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+  });
+  box.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  box.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) show(at + (dx < 0 ? 1 : -1));
+  });
+})();
+</script>
+</body></html>
