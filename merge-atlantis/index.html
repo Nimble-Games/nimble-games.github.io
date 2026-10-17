@@ -64,6 +64,7 @@ body {
 .hero {
   position: relative; display: flex; align-items: flex-end; justify-content: flex-end; aspect-ratio: 16 / 9;
   border-radius: 28px; overflow: hidden; background: #8fd6e6;
+  container-type: inline-size;   /* the card is sized against the video frame (cqw) */
   box-shadow: 0 24px 60px rgba(0, 0, 0, .12);
 }
 .hero-art, .hero-print { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
@@ -87,41 +88,58 @@ body {
   animation: rise 7s linear infinite; opacity: 0;
 }
 @keyframes rise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: .9; } 50% { transform: translateY(-260%) translateX(12px); } 90% { opacity: .8; } 100% { transform: translateY(-560%) translateX(-6px); opacity: 0; } }
-/* a compact card tucked into the bottom-right corner, so the video carries the header */
+/* The header card: the Merge Crown page's proportions (measured live at a 980 px frame: 24 px from the edges,
+   22/24 px padding, a 150 px icon, a 38 px name, a 20 px tagline, a 40 px store-badge row), sized in cqw so it keeps
+   the same share of the video frame at every width. Lighter tint and blur than Crown so more video shows through.
+   Each cqw value is preceded by its px value at a 980 px frame, for browsers without container units. */
 .glass {
-  position: relative; z-index: 1; margin: 16px;
-  display: grid; grid-template-columns: 60px minmax(0, auto); gap: 10px; align-items: center;
-  max-width: min(100% - 32px, 360px);
-  padding: 8px 14px 8px 8px;
+  position: relative; z-index: 1;
+  margin: 24px; margin: 2.45cqw;
+  display: grid; grid-template-columns: auto minmax(0, auto); align-items: center;
+  column-gap: 24px; column-gap: 2.45cqw;
+  padding: 22px 24px 22px 22px; padding: 2.25cqw 2.45cqw 2.25cqw 2.25cqw;
   background: var(--glass);
-  -webkit-backdrop-filter: blur(7px) saturate(150%);
-  backdrop-filter: blur(7px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  backdrop-filter: blur(8px) saturate(150%);
   border: 1px solid var(--glass-edge);
-  border-radius: 16px;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, .18), inset 0 1px 1px var(--glass-edge);
+  border-radius: 22px; border-radius: 2.25cqw;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .22), inset 0 1px 1px var(--glass-edge);
   overflow: hidden;
 }
 .glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(180deg, var(--glass-sheen), transparent 45%); }
 .glass > * { position: relative; z-index: 1; }
-.glass-body { display: grid; gap: 3px; min-width: 0; align-content: center; justify-items: start; }
+.glass-body { display: grid; gap: 8px; gap: .82cqw; min-width: 0; align-content: center; justify-items: start; }
 .icon-cell { display: grid; place-items: center; }
-.app-icon { width: 60px; height: 60px; border-radius: 22%; border: 2px solid var(--glass-edge); box-shadow: 0 8px 18px rgba(0, 0, 0, .25); object-fit: cover; display: block; }
+.app-icon {
+  width: 150px; height: 150px; width: max(84px, 15.3cqw); height: max(84px, 15.3cqw);
+  border-radius: 24%; border: 2px solid var(--glass-edge); box-shadow: 0 14px 30px rgba(0, 0, 0, .3); object-fit: cover; display: block;
+}
 h1 {
-  margin: 0 0 2px; font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1.05; letter-spacing: .01em;
+  margin: 0; font-family: var(--font-display); font-weight: 800; line-height: 1.02; letter-spacing: .01em;
+  font-size: 38px; font-size: max(22px, 3.88cqw);
   color: var(--title-fill);
   text-shadow:
-    2px 0 0 var(--title-stroke), -2px 0 0 var(--title-stroke), 0 2px 0 var(--title-stroke), 0 -2px 0 var(--title-stroke),
-    1.5px 1.5px 0 var(--title-stroke), -1.5px 1.5px 0 var(--title-stroke), 1.5px -1.5px 0 var(--title-stroke), -1.5px -1.5px 0 var(--title-stroke),
-    0 3px 0 var(--title-stroke), 1.5px 3px 0 var(--title-stroke), -1.5px 3px 0 var(--title-stroke), 0 5px 8px rgba(0, 0, 0, .25);
+    .079em 0 0 var(--title-stroke), -.079em 0 0 var(--title-stroke), 0 .079em 0 var(--title-stroke), 0 -.079em 0 var(--title-stroke),
+    .053em .053em 0 var(--title-stroke), -.053em .053em 0 var(--title-stroke), .053em -.053em 0 var(--title-stroke), -.053em -.053em 0 var(--title-stroke),
+    0 .132em 0 var(--title-stroke), .053em .105em 0 var(--title-stroke), -.053em .105em 0 var(--title-stroke), 0 .21em .37em rgba(0, 0, 0, .25);
 }
-.tagline { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 14px; line-height: 1.15; color: var(--ink); text-wrap: balance; text-shadow: 0 0 6px var(--halo), 0 1px 1px var(--halo); }
-.status-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 1px; }
+.tagline {
+  margin: .1em 0 0; font-family: var(--font-display); font-weight: 800; line-height: 1.15; color: var(--ink); white-space: nowrap;
+  font-size: 20px; font-size: max(13px, 2.04cqw);
+  text-shadow: 0 0 6px var(--halo), 0 1px 1px var(--halo);
+}
+.status-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; gap: .6cqw 1.2cqw; margin-top: 2px; }
 .pill {
-  display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px 3px; border-radius: 999px;
-  background: var(--fill); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 12px; line-height: 1;
+  display: inline-flex; align-items: center; gap: .45em; padding: .66em 1em .6em; border-radius: 999px;
+  background: var(--fill); color: #fff; font-family: var(--font-display); font-weight: 800; line-height: 1;
+  font-size: 16px; font-size: max(11px, 1.63cqw);
 }
-.pill i { width: 7px; height: 7px; border-radius: 50%; background: #9df07f; box-shadow: 0 0 0 3px rgba(157,240,127,.3); }
-.soon { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 12px; color: var(--ink); text-shadow: 0 0 6px var(--halo), 0 1px 1px var(--halo); }
+.pill i { width: .55em; height: .55em; border-radius: 50%; background: #9df07f; box-shadow: 0 0 0 .2em rgba(157,240,127,.3); }
+.soon {
+  margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--ink);
+  font-size: 15px; font-size: max(11px, 1.53cqw);
+  text-shadow: 0 0 6px var(--halo), 0 1px 1px var(--halo);
+}
 
 /* ---------- shared card + section head ---------- */
 .card { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); }
@@ -414,11 +432,19 @@ html.export .hint { display: none; }
 @media screen and (max-width: 640px) {
   .hero { flex-direction: column; align-items: stretch; min-height: 0; overflow: visible; background: none; box-shadow: none; aspect-ratio: auto; }
   .hero-art { position: relative; height: auto; aspect-ratio: 16 / 9; border-radius: 22px; }
-  .glass { margin: -16px 10px 0; max-width: none; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding: 8px 12px 8px 8px; border-radius: 16px; background: var(--card); -webkit-backdrop-filter: none; backdrop-filter: none; border-color: var(--ring); box-shadow: var(--shadow); }
-  .app-icon { width: 52px; height: 52px; }
-  h1 { font-size: 21px; }
-  .tagline { font-size: 14px; text-shadow: none; max-width: none; }
-  .soon { text-shadow: none; color: var(--muted); }
+  .glass {
+    margin: -24px 12px 0; padding: 14px; border-radius: 22px;
+    grid-template-columns: 96px minmax(0, 1fr); grid-template-areas: "icon name" "icon status" "tag tag"; column-gap: 14px; row-gap: 6px;
+    background: var(--card); -webkit-backdrop-filter: none; backdrop-filter: none; border-color: var(--ring); box-shadow: var(--shadow);
+  }
+  .glass-body { display: contents; }
+  .icon-cell { grid-area: icon; }
+  .app-icon { width: 96px; height: 96px; }
+  h1 { grid-area: name; align-self: end; font-size: 26px; }
+  .status-row { grid-area: status; align-self: start; gap: 6px 10px; margin-top: 0; }
+  .pill { font-size: 13px; }
+  .soon { font-size: 13px; text-shadow: none; color: var(--muted); }
+  .tagline { grid-area: tag; font-size: 17px; margin-top: 4px; text-shadow: none; }
   .loop { padding: 20px 14px 24px; }
   .legend li { padding: 8px 10px; column-gap: 12px; grid-template-columns: 34px 1fr; }
   .legend .badge { width: 34px; height: 34px; font-size: 17px; }
@@ -500,7 +526,7 @@ html.export .hint { display: none; }
   .hero { aspect-ratio: 16 / 9; }
   .hero-art { display: none !important; }
   .hero-print { display: block; }
-  .glass { background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: none; backdrop-filter: none; margin: 14px; }
+  .glass { background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .tagline, .soon { text-shadow: none; }
   .bet, .swap, .loop, .adv, .shots, .status, .kingdom { padding: 14px 18px 16px; gap: 10px; }
   .sec-head h2, .loop-title { font-size: 20px; }
