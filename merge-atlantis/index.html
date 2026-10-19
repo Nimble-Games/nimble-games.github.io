@@ -135,6 +135,11 @@ h1 {
   font-size: 16px; font-size: max(11px, 1.63cqw);
 }
 .pill i { width: .55em; height: .55em; border-radius: 50%; background: #9df07f; box-shadow: 0 0 0 .2em rgba(157,240,127,.3); }
+.badge-slot { display: block; line-height: 0; border-radius: 8px; transition: transform .15s ease; }
+.badge-slot img { display: block; width: auto; height: 40px; height: max(30px, 4.08cqw); }
+a.badge-slot:hover { transform: translateY(-2px); }
+a.badge-slot:focus-visible, .soon a:focus-visible { outline: 3px solid var(--royal); outline-offset: 3px; }
+.soon a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .soon {
   margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--ink);
   font-size: 15px; font-size: max(11px, 1.53cqw);
@@ -434,7 +439,7 @@ html.export .hint { display: none; }
   .hero-art { position: relative; height: auto; aspect-ratio: 16 / 9; border-radius: 22px; }
   .glass {
     margin: -24px 12px 0; padding: 14px; border-radius: 22px;
-    grid-template-columns: 96px minmax(0, 1fr); grid-template-areas: "icon name" "icon status" "tag tag"; column-gap: 14px; row-gap: 6px;
+    grid-template-columns: 96px minmax(0, 1fr); grid-template-areas: "icon name" "icon status" "tag tag" "soon soon"; column-gap: 14px; row-gap: 6px;
     background: var(--card); -webkit-backdrop-filter: none; backdrop-filter: none; border-color: var(--ring); box-shadow: var(--shadow);
   }
   .glass-body { display: contents; }
@@ -443,7 +448,8 @@ html.export .hint { display: none; }
   h1 { grid-area: name; align-self: end; font-size: 26px; }
   .status-row { grid-area: status; align-self: start; gap: 6px 10px; margin-top: 0; }
   .pill { font-size: 13px; }
-  .soon { font-size: 13px; text-shadow: none; color: var(--muted); }
+  .badge-slot img { height: 34px; }
+  .soon { grid-area: soon; font-size: 13px; text-shadow: none; color: var(--muted); }
   .tagline { grid-area: tag; font-size: 17px; margin-top: 4px; text-shadow: none; }
   .loop { padding: 20px 14px 24px; }
   .legend li { padding: 8px 10px; column-gap: 12px; grid-template-columns: 34px 1fr; }
@@ -528,6 +534,7 @@ html.export .hint { display: none; }
   .hero-print { display: block; }
   .glass { background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .tagline, .soon { text-shadow: none; }
+  .soon a::after { content: " \2014  " attr(data-print); text-transform: none; letter-spacing: .02em; }
   .bet, .swap, .loop, .adv, .shots, .status, .kingdom { padding: 14px 18px 16px; gap: 10px; }
   .sec-head h2, .loop-title { font-size: 20px; }
   .bet-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
@@ -610,7 +617,11 @@ html.export .hint { display: none; }
       <div class="glass-body">
         <h1>Merge Atlantis</h1>
         <p class="tagline">Merge. Build. Decorate under the sea.</p>
-        <div class="status-row"><span class="pill"><i></i>Playable prototype</span><span class="soon">Not in stores yet</span></div>
+        <div class="status-row">
+          <a class="badge-slot" href="https://testflight.apple.com/join/VgS9f84Y" target="_blank" rel="noopener" title="Join the iOS beta on TestFlight"><img src="img/app-store.svg" alt="Join the iOS beta on TestFlight" width="135" height="40"></a>
+          <span class="pill"><i></i>Public beta</span>
+        </div>
+        <p class="soon">iOS beta open on <a href="https://testflight.apple.com/join/VgS9f84Y" target="_blank" rel="noopener" data-print="testflight.apple.com/join/VgS9f84Y">TestFlight</a></p>
       </div>
     </div>
   </header>
@@ -885,13 +896,14 @@ html.export .hint { display: none; }
   <section class="status card" aria-labelledby="status-title">
     <div class="sec-head">
       <p class="kicker">Where we are</p>
-      <h2 id="status-title">A playable prototype in Unity</h2>
+      <h2 id="status-title">A playable prototype, open as an iOS beta</h2>
       <p>Built in days on the engine behind Merge Crown, so merging, crews, timers and saves worked from the start.</p>
     </div>
     <div class="status-cols">
       <div class="col">
         <h3>Playable today <span class="chip">Built</span></h3>
         <ul class="checks">
+          <li><span class="ic">✓</span><span><b>A public iOS beta</b> on TestFlight: anyone with the link can install and play it.</span></li>
           <li><span class="ic">✓</span><span><b>The reef board:</b> harvest, merge and build on one 7 × 9 board, with no orders and no fog.</span></li>
           <li><span class="ic">✓</span><span><b>Goals</b> that come a few at a time and complete on their own.</span></li>
           <li><span class="ic">✓</span><span><b>The jellyfish and octopus crew</b> in 3D, working jobs on timers.</span></li>
@@ -911,7 +923,7 @@ html.export .hint { display: none; }
           <li><span class="ic">→</span><span><b>More creatures and pets</b> to call and collect.</span></li>
           <li><span class="ic">→</span><span><b>Economy and balancing:</b> energy, harvest pace and rewards.</span></li>
           <li><span class="ic">→</span><span><b>Monetization design</b> and live events.</span></li>
-          <li><span class="ic">→</span><span><b>Store builds and a soft-launch test</b> of the retention bet.</span></li>
+          <li><span class="ic">→</span><span><b>App Store and Google Play releases,</b> and a soft-launch test of the retention bet.</span></li>
         </ul>
       </div>
     </div>
